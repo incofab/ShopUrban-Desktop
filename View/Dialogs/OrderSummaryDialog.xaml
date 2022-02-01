@@ -1,0 +1,61 @@
+﻿<Window x:Class="ShopUrban.View.Dialogs.OrderSummaryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShopUrban.View.Dialogs"
+        mc:Ignorable="d"
+        Title="Order Summary" Height="330" Width="400"
+        Icon="/logo.ico"
+        WindowStartupLocation="CenterScreen"
+        >
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical" >
+            <TextBlock Text="Payment Summary" Margin="10 5 0 5" />
+            <Separator />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0 10 0 10">
+            <Grid Margin="10 10 10 0">
+                <TextBlock Text="Delivery fee" HorizontalAlignment="Left" />
+                <TextBlock x:Name="tbDeliveryFee" Text="N0" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="10 10 10 0">
+                <TextBlock Text="VAT" HorizontalAlignment="Left" />
+                <TextBlock x:Name="tbVAT" Text="N0" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="10 10 10 0">
+                <TextBlock Text="Total Payable" HorizontalAlignment="Left" />
+                <TextBlock x:Name="tbGrossTotalAmount" Text="N0" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="10 10 10 0">
+                <TextBlock Text="Payment Type" HorizontalAlignment="Left" />
+                <TextBlock x:Name="tbPaymentType" Text="{Binding paymentType}" HorizontalAlignment="Right" />
+            </Grid>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
+            <Button Content="Draft" Name="btnDraft" Click="btnDraft_Click" Height="28" FontSize="12" Cursor="Hand"
+                    Style="{StaticResource MaterialDesignPaperSecondaryDarkButton}" />
+            <Button Content="Cash" Name="btnCash" Click="btnCash_Click" Height="28" FontSize="12" Cursor="Hand"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" Margin="10 0 0 0"/>
+            <Button Content="POS" Name="btnPOS" Click="btnPOS_Click" Height="28" Margin="10 0 0 0" FontSize="12" Cursor="Hand"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}"/>
+            <Button Content="Bank Transfer" Name="btnBankTransfer" Click="btnBankTransfer_Click" Height="28" Cursor="Hand"
+                    Margin="10 0 0 0" FontSize="12" Style="{StaticResource MaterialDesignPaperDarkButton}"  />
+        </StackPanel>
+        <Grid Grid.Row="3" Margin="10 15 10 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="7*" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="tboxAmountPaid" Grid.Column="0" Text="20,000" VerticalContentAlignment="Bottom" />
+            <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedButton}" Margin="15 0 0 0"
+                    Cursor="Hand" Name="btnConfirm" Click="btnConfirm_Click">Confirm</Button>
+        </Grid>
+    </Grid>
+</Window>

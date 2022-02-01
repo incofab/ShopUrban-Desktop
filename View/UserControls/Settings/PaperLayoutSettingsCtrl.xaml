@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="ShopUrban.View.UserControls.Settings.PaperLayoutSettingsCtrl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopUrban.View.UserControls.Settings"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             >
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Receipt paper size" VerticalAlignment="Center" Margin="0 0 0 5" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <CheckBox x:Name="cbA4" Content="A4" Click="cbA4_Click" />
+                <CheckBox x:Name="cb88mm" Content="Thermal 88mm" Click="cb88mm_Click" Margin="10 0 10 0" />
+                <CheckBox x:Name="cb58mm" Content="Thermal 58mm" Click="cb58mm_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

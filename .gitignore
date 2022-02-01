@@ -1,0 +1,36 @@
+# Installation constants are different for both server and local machine
+/config/inst.php
+
+# Do not track external libraries
+/vendor/**
+
+# Eclipse folders
+/.externalToolBuilders/**
+/.sass-cache/**
+/.settings/**
+
+# Eclipse files
+.buildpath
+.project
+.htaccess
+
+# Ignore zipped files
+**/*.zip
+**/*.exe
+**/*.msi
+
+# Ignore the error log file
+/public/errorlog.txt
+
+// Ignore setting file
+/app/settings.json
+/config/pax_services.json
+
+
+#Ignore these folders
+/Assets/Content/**
+/bin/** 
+/obj/**
+/packages/**
+
+error_log

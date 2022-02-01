@@ -1,0 +1,5 @@
+#Ignore all files except the gitignore file
+*
+!.gitignore
+
+# The file SQLite.Interop.dll should be in this folder. The app will need it when installed in another PC.

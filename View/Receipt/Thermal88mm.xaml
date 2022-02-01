@@ -1,0 +1,127 @@
+﻿<Window x:Class="ShopUrban.View.Receipt.Thermal88mm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShopUrban.View.Receipt"
+        xmlns:conv="clr-namespace:ShopUrban.Converters"
+        mc:Ignorable="d"
+        Title="Print Layout - Thermal 88mm" Height="Auto" Width="332"
+        WindowStartupLocation="CenterScreen"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="White"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        Icon="/logo.ico"
+        >
+    <Window.Resources>
+        <conv:NairaConverter x:Key="nairaConverter" />
+    </Window.Resources>
+    <Grid Margin="10">
+        <!--
+        Title="Thermal58mm" Height="450" Width="219">
+        -->
+        <StackPanel>
+            <TextBlock x:Name="tbShopName" Text="{Binding shop.name}" 
+                       FontSize="18" FontWeight="Medium"
+                       Typography.Capitals="AllSmallCaps" HorizontalAlignment="Center" Height="24"/>
+            <TextBlock x:Name="tbAddress" Text="{Binding shop.address.street_name}" HorizontalAlignment="Center"
+                        FontSize="{StaticResource receipt_font_size_88mm}" />
+            <TextBlock x:Name="tbLocation" HorizontalAlignment="Center"
+                        FontSize="{StaticResource receipt_font_size_88mm}" >
+                <TextBlock Text="{Binding shop.address.city.name}" />,
+                <TextBlock Text="{Binding shop.address.state.name}" />
+            </TextBlock>
+            <TextBlock x:Name="tbContact" Text="{Binding shop.whats_app_number}" 
+                       HorizontalAlignment="Center" FontSize="{StaticResource receipt_font_size_88mm}" />
+            <Grid Margin="0 10 0 0">
+                <TextBlock Text="Order No:" Margin="0 0 0 0" HorizontalAlignment="Left"
+                           FontSize="{StaticResource receipt_font_size_88mm}"/>
+                <TextBlock Text="{Binding order.order_number}" FontSize="12" HorizontalAlignment="Right"
+                           FontWeight="DemiBold" />
+            </Grid>
+            <Separator Background="#E0E0E0" />
+            <Grid Margin="0 10 0 0">
+                <TextBlock Text="Receipt of Purchase" HorizontalAlignment="Left"/>
+                <TextBlock x:Name="tbOrderTime" Text="{Binding order.created_at}" HorizontalAlignment="Right"/>
+            </Grid>
+            <Grid Margin="0 5 0 0">
+                <TextBlock Text="Staff" HorizontalAlignment="Left"/>
+                <TextBlock x:Name="tbStaffName" Text="{Binding staff.name}" HorizontalAlignment="Right" />
+            </Grid>
+            <Separator Background="#EAEAEA" Margin="0 10 0 10" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" MinWidth="40" />
+                    <ColumnDefinition Width="Auto" MinWidth="35" />
+                    <ColumnDefinition Width="Auto" MinWidth="40" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="PRODUCT" Grid.Column="0" Grid.Row="0" FontSize="10" VerticalAlignment="Center" 
+                           FontWeight="DemiBold" />
+                <TextBlock Text="PRICE" Grid.Column="1" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold" />
+                <TextBlock Text="QTY" Grid.Column="2" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold" />
+                <TextBlock Text="TOTAL" Grid.Column="3" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding cartItems}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0 5 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="35" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding shopProduct.name}" Grid.Column="0" Grid.Row="0" FontSize="10" VerticalAlignment="Center" 
+                           FontWeight="DemiBold" />
+                            <TextBlock Text="{Binding priceNaira}" Grid.Column="1" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold"/>
+                            <TextBlock Text="{Binding quantity}" Grid.Column="2" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold"/>
+                            <TextBlock Text="{Binding totalPriceNaira}" Grid.Column="3" Grid.Row="0" FontSize="10" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" FontWeight="DemiBold"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Separator Margin="0 10" Background="#EAEAEA"/>
+            <Grid Margin="0 4">
+                <TextBlock Text="Sub Total" HorizontalAlignment="Left" FontWeight="DemiBold"/>
+                <TextBlock Text="{Binding cart.amount, Converter={StaticResource nairaConverter}}" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="0 4">
+                <TextBlock Text="Delivery Fee" HorizontalAlignment="Left" FontWeight="DemiBold" FontSize="11"/>
+                <TextBlock Text="{Binding order.shipping_cost, Converter={StaticResource nairaConverter}}" HorizontalAlignment="Right" FontSize="11" />
+            </Grid>
+            <Grid Margin="0 4">
+                <TextBlock Text="VAT" HorizontalAlignment="Left" FontWeight="DemiBold" FontSize="11"/>
+                <TextBlock Text="{Binding order.vat_amount, Converter={StaticResource nairaConverter}}" HorizontalAlignment="Right" FontSize="11" />
+            </Grid>
+            <Grid Margin="0 4">
+                <TextBlock Text="Total" HorizontalAlignment="Left" FontWeight="DemiBold" />
+                <TextBlock Text="{Binding order.totalAmountNaira}" HorizontalAlignment="Right" />
+            </Grid>
+            <Separator Margin="0 3" Background="#EFEFEF"/>
+            <Grid Margin="0 4">
+                <TextBlock Text="Amount paid" HorizontalAlignment="Left" FontWeight="DemiBold"/>
+                <TextBlock Text="{Binding order.amount_paid, Converter={StaticResource nairaConverter}}" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="0 4">
+                <TextBlock Text="Amount Remaining" HorizontalAlignment="Left" FontWeight="DemiBold"/>
+                <TextBlock Text="{Binding order.remaining_amount, Converter={StaticResource nairaConverter}}" HorizontalAlignment="Right" />
+            </Grid>
+            <Separator Margin="0 10" Background="#D0D0D0" />
+            <TextBlock Text="Thanks for your Patronage" HorizontalAlignment="Center" FontSize="16"
+                       FontWeight="Bold"/>
+            <Button x:Name="btnPrint" Style="{StaticResource plainButton}" Margin="0 10 10 0" 
+                    HorizontalAlignment="Right" Click="btnPrint_Click"
+                    >
+                <materialDesign:PackIcon Kind="Printer" Width="25" Height="25" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

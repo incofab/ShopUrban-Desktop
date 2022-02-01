@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="ShopUrban.View.UserControls.Cart.CartSectionCtrl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopUrban.View.UserControls.Cart"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="450"
+             Background="GreenYellow"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+            FontFamily="{materialDesign:MaterialDesignFont}"
+             >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="5 5 5 5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <Image Source="/shop_urban_name.png" Grid.Column="0" Width="180" />
+            <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock x:Name="tbStaffName" Text="Staff Name" Foreground="#404040" FontSize="8" FontWeight="DemiBold" />
+                <TextBlock x:Name="tbRole" Text="Admin Account" Foreground="#AEAEAE" FontSize="7" />
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" x:Name="cartBox" Visibility="Visible">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" >
+                <StackPanel Orientation="Vertical" Margin="5 0" x:Name="cartItemContainer" ></StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="15 0">
+                <Grid Visibility="Collapsed">
+                    <TextBlock x:Name="tbCartTotalPrice" Text="{Binding cartTotalPrice}" HorizontalAlignment="Right" />
+                </Grid>
+                <Grid Margin="0 5" Visibility="Collapsed">
+                    <TextBlock x:Name="tbDeliveryFeeText" Text="Delivery Fee" HorizontalAlignment="Left"  />
+                    <TextBlock x:Name="tbDeliveryFee" Text="N0" HorizontalAlignment="Right" />
+                </Grid>
+                <Grid Margin="0 7 0 0">
+                    <TextBlock x:Name="tbTotalPriceText" Text="Sub Total" HorizontalAlignment="Left" FontSize="16" />
+                    <TextBlock x:Name="tbItemCount" Text="20 Items" HorizontalAlignment="Center" FontSize="16" />
+                    <TextBlock x:Name="tbTotalPrice" Text="N0" HorizontalAlignment="Right" FontSize="16" />
+                </Grid>
+            </StackPanel>
+            <Button Grid.Row="2" x:Name="btnCheckout" Click="btnCheckout_Click" Margin="20, 10, 20,10" Cursor="Hand"
+                    Style="{StaticResource MaterialDesignFlatDarkBgButton}" >
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="CheckCircle"/>
+                    <TextBlock Margin="4 0 0 0">Proceed To Check Out</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <StackPanel Grid.Row="0" Grid.RowSpan="2" x:Name="boxCartEmpty" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image Source="/logo.ico" Width="100" Height="100" Opacity="0.4" />
+            <TextBlock Text="Cart Empty" VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" FontSize="16" Margin="0 10 0 0" />
+        </StackPanel>
+    </Grid>
+</UserControl>
