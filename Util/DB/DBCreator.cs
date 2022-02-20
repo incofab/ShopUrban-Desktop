@@ -15,7 +15,7 @@ namespace ShopUrban.Util
     class DBCreator
     {
         public static string dbPath = KStrings.BASE_FOLDER + "DB";
-        public static string dbFilePath = dbPath + "\\shopUrbanDb.db";
+        public static string dbFilePath = dbPath + $"\\shopUrbanDb-v-{KStrings.VERSION}.db";
         public static string dbConnectionString = string.Format("Data Source={0};", dbFilePath);
 
         private static DBCreator instance;

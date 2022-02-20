@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="ShopUrban.View.UserControls.TopMenuRight"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:ShopUrban.View.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="800"
+             Background="White"
+             >
+    <Grid>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Button Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Check for Update"
+                   Click="checkUpdate_Click" Cursor="Hand" >
+                <materialDesign:PackIcon Name="iconCheckUpdate" Kind="Update" 
+                                         Foreground="DarkGreen" FontWeight="Bold" />
+            </Button>
+            <Button x:Name="btnSyncProducts" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Download and synchronize products"
+                   Click="btnSyncProducts_Click" Cursor="Hand" >
+                <materialDesign:PackIcon Name="iconSyncProducts" Kind="CloudRefresh" 
+                                         Foreground="{StaticResource SecondaryHueMidForegroundBrush}" />
+            </Button>
+            <Button Name="btnUploadOrder" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Upload recently added orders"
+                   Click="btnUploadOrder_Click" Cursor="Hand" >
+                <materialDesign:PackIcon Name="iconUploadOrder" Kind="CloudUploadOutline" 
+                                         Foreground="{StaticResource PrimaryHueDarkBrush}" />
+            </Button>
+            <Button x:Name="btnLogout" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Logout" 
+                        Click="btnLogout_Click" Cursor="Hand" >
+                <materialDesign:PackIcon Kind="Power" Foreground="Red" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -27,12 +27,14 @@ namespace ShopUrban.Model
             "amount_paid decimal(8,2) DEFAULT 0," +
             "remaining_amount decimal(8,2) DEFAULT 0," +
             "vat_amount decimal(8,2) DEFAULT 0," +
+            "customer_name VARCHAR," +
             TIME_STAMPS +
             ")";
 
         public static string[] fillable = {
             "cart_id", "staff_id", "user_id", "order_number", "amount", "status", "shipping_cost",
-            "total_cost_price", "profit", "amount_to_pay", "amount_paid", "remaining_amount", "vat_amount"
+            "total_cost_price", "profit", "amount_to_pay", "amount_paid", "remaining_amount", "vat_amount",
+            "customer_name",
         };
 
         const string table = "orders";
@@ -57,6 +59,7 @@ namespace ShopUrban.Model
         public double vat_amount { get; set; }
         public string amountPaidNaira { get { return Helpers.naira(amount_paid); } }
         public string remainingAmountNaira { get { return Helpers.naira(remaining_amount); } }
+        public string customer_name { get; set; }
         public Cart cart { get; set; }
         public List<OrderPayment> orderPayments { get; set; }
         public Staff staff { get; set; }
@@ -158,5 +161,13 @@ namespace ShopUrban.Model
             return query != null && query.Count() > 0;
         }
 
+        public static List<Order> getUnUploadedOrders()
+        {
+            int.TryParse(Setting.getValue(Setting.KEY_ORDER_LAST_SYNC_ID), out int orderLastId);
+
+            string shopId = Setting.getShopId();
+
+            return Order.all(orderLastId);
+        }
     }
 }

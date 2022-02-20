@@ -13,32 +13,24 @@ namespace ShopUrban.Util
             Environment.SpecialFolder.CommonApplicationData) + $"/{APP_NAME}/";
         // Local 77777779, 1234, 4399595348343
         //Staging: En-En-1104, 0503, +2348032485925 ... Rotate and Shine En-Ti-1228
-        //Production: En-En-0107, 0102, +2348032485925 ...
+        //Production: En-En-1014|En-En-0107, 0102, +2348032485925
         private static BrushConverter converter = new BrushConverter();
         //var brush = (Brush)converter.ConvertFromString("#FFFFFF90");
         public const string APP_NAME = "ShopUrban";
         
         public const bool DEV = true;
+        public const int VERSION = 1;
         public const int APP_PRICE = 1500;
         public const string SITE_EMAIL = "support@shopurban.co";
-        public const string WEBSITE = "www.shopurban.co";
+        public const string WEBSITE = "https://shopurban.co";
         public const string SMS_PHONE_NO = CUSTOMER_CARE_NUMBER;
-        public const string CUSTOMER_CARE_NUMBER = "08133744803";
-        public const string FACEBOOK_PAGE = "www.shopurban.co/facebook";
-        public const string YOUTUBE_PAGE = "www.shopurban.co/youtube";
+        public const string CUSTOMER_CARE_NUMBER = "09034302172";
+        public const string FACEBOOK_PAGE = "https://shopurban.co/facebook";
+        public const string YOUTUBE_PAGE = "https://shopurban.co/youtube";
         public const string TIME_FORMAT = "yyyy-M-d H:m:s.s";
 
         public const string NAIRA_SIGN = "₦"; // ((char)8358).ToString();
-        public const string ACCOUNT_NAME = "Exam Scholars";
-        public const string ACCOUNT_NUMBER = "0657550955";
-        public const string BANK_NAME = "Guaranty Trust (GT) Bank";
-
-        public const string OPTION_A = "A";
-        public const string OPTION_B = "B";
-        public const string OPTION_C = "C";
-        public const string OPTION_D = "D";
-        public const string OPTION_E = "E";
-
+        
         public const string URL_BASE = (DEV 
             //? "https://testapi.shopurban.co/"
             ? "http://192.168.56.1:8000/"
@@ -47,6 +39,8 @@ namespace ShopUrban.Util
         public const string URL_LOGIN_API = URL_BASE_API + "shop/user/login";
         public const string URL_GET_PRODUCTS_API = URL_BASE_API + "shop/product/index";
         public const string URL_UPLOAD_ORDERS_API = URL_BASE_API + "shop/order/upload";
+        public const string URL_SHOP_PRODUCT_UPDATE = URL_BASE_API + "shop/product/update";
+        public const string URL_SHOP_PRODUCT_STOCK_ACTION = URL_BASE_API + "shop/product/stock-action";
 
         public const string URL_FEEDBACK_API = URL_BASE_API + "feedback/store";
         public const string URL_GET_ANNOUNCEMENT_API = URL_BASE_API + "announcements";

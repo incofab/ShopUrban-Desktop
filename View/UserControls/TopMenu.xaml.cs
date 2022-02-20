@@ -1,4 +1,5 @@
 ﻿using ShopUrban.Model;
+using ShopUrban.Services;
 using ShopUrban.Util;
 using ShopUrban.View.Dialogs;
 using System;
@@ -32,25 +33,9 @@ namespace ShopUrban.View.UserControls
 
             if (messageBoxResult != MessageBoxResult.Yes) return;
 
-            DateTime.Now.ToString(KStrings.TIME_FORMAT);
-            Setting.update(new
-            {
-                key = Setting.KEY_REMEMBER_LOGIN,
-                display_name = "Remeber Login",
-                value = "",
-                type = "boolean"
-            }, Setting.KEY_REMEMBER_LOGIN);
-
-            Setting.update(new
-            {
-                key = Setting.KEY_LOGGED_IN_STAFF_ID,
-                display_name = "Logged in Staff ID",
-                value = "",
-                type = "integer"
-            }, Setting.KEY_LOGGED_IN_STAFF_ID);
-
-            MyEventBus.post(new EventMessage(EventMessage.EVENT_LOGOUT, null));
+            LoginHelper.logout();
         }
+
         private void WebsiteClick(object sender, RoutedEventArgs e)
         {
             MessageBox.Show($"Visit the website");
@@ -73,16 +58,16 @@ namespace ShopUrban.View.UserControls
 
         private void ContactUsClick(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(KStrings.WEBSITE);
+            Helpers.openUrl(KStrings.WEBSITE);
         }
 
         private void FacebookClick(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(KStrings.FACEBOOK_PAGE);
+            Helpers.openUrl(KStrings.FACEBOOK_PAGE);
         }
         private void YoutubeChannelClick(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(KStrings.YOUTUBE_PAGE);
+            Helpers.openUrl(KStrings.YOUTUBE_PAGE);
         }
         private void UploadOrdersClick(object sender, RoutedEventArgs e)
         {
@@ -92,5 +77,29 @@ namespace ShopUrban.View.UserControls
         {
             MyEventBus.post(new EventMessage(EventMessage.EVENT_OPEN_PRODUCT_SYNC, null));
         }
+        private void checkUpdateClick(object sender, RoutedEventArgs e)
+        {
+            checkUpdate();
+        }
+
+        private async void checkUpdate()
+        {
+            var updateAvailable = await SquirrelHelper.getInstance().checkForUpdate();
+
+            if (!updateAvailable)
+            {
+                MessageBox.Show("Product is upto date");
+                return;
+            }
+
+            MessageBoxResult messageBoxResult = MessageBox.Show(
+                "A new version of the software is available. Click Ok to update now.\nIt will only take a few minutes", 
+                "New Update Available", MessageBoxButton.OKCancel);
+
+            if (messageBoxResult != MessageBoxResult.OK) return;
+
+            SquirrelHelper.getInstance().update();
+        }
+
     }
 }

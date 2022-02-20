@@ -1,4 +1,5 @@
-﻿using ShopUrban.Model;
+﻿using MaterialDesignThemes.Wpf;
+using ShopUrban.Model;
 using ShopUrban.Model.Others;
 using ShopUrban.Util;
 using ShopUrban.Util.Network;
@@ -48,7 +49,7 @@ namespace ShopUrban
 
             //menuItemFrame.Navigate(productListCtrl);
             //borderProductList.Child = productListCtrl;
-            borderCartSection.Child = new CartSectionCtrl();
+            //borderCartSection.Child = new CartSectionCtrl();
             boxEmpty.Children.Add(new ProductSyncCtrl(this));
 
             handleDisplay();
@@ -56,12 +57,17 @@ namespace ShopUrban
             menuItems = getMenuItems();
             lbMenuItems.ItemsSource = menuItems;
 
-            lbMenuItems.SelectedItem = ((List<SideMenu>)lbMenuItems.ItemsSource)[0];
-            lbMenuItems_SelectionChanged(lbMenuItems, null);
+            lbMenuItems.SelectedIndex = 0;
+            //lbMenuItems.SelectedItem = ((List<SideMenu>)lbMenuItems.ItemsSource)[0];
+            //lbMenuItems_SelectionChanged(lbMenuItems, null);
 
             MyEventBus.subscribe(handleEvent);
 
             AutoSyncOrders.getInstance().start();
+
+            productListCtrl.tbSearch.Focus();
+
+            this.Title = "ShopUrban - v"+Helpers.getVersionNo();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -74,11 +80,11 @@ namespace ShopUrban
         {
             List<SideMenu> l = new List<SideMenu>();
 
-            l.Add(new SideMenu { index = 1, title = "Stock", view = productListCtrl });
-            l.Add(new SideMenu { index = 2, title = "Orders", view = null });
-            l.Add(new SideMenu { index = 3, title = "Settings", view = new SettingsUserCtrl() });
-            l.Add(new SideMenu { index = 4, title = "Product Sync", view = new ProductSyncCtrl(this) });
-            l.Add(new SideMenu { index = 5, title = "Draft", view = null });
+            l.Add(new SideMenu { index = 1, title = "Stock", icon = PackIconKind.CartOutline, view = productListCtrl });
+            l.Add(new SideMenu { index = 2, title = "Orders", icon = PackIconKind.BasketOutline, view = null });
+            l.Add(new SideMenu { index = 3, title = "Draft", icon = PackIconKind.BriefcaseOutline, view = null });
+            l.Add(new SideMenu { index = 4, title = "Settings", icon = PackIconKind.GearOutline, view = new SettingsUserCtrl() });
+            //l.Add(new SideMenu { index = 4, title = "Product Sync", icon = PackIconKind.Reload, view = new ProductSyncCtrl(this) });
 
             return l;
         }
@@ -90,7 +96,7 @@ namespace ShopUrban
             var productLastSync = Setting.getValue(Setting.KEY_PRODUCT_LAST_SYNC);
             var imagesSynced = Setting.getValue(Setting.KEY_IMAGES_SYNCED);
 
-            if(productLastSync == null || imagesSynced != "true")
+            if (productLastSync == null || imagesSynced != "true")
             {
                 boxEmpty.Visibility = Visibility.Visible;
             }
@@ -98,7 +104,7 @@ namespace ShopUrban
             {
                 boxEmpty.Visibility = Visibility.Collapsed;
             }
-                //boxEmpty.Visibility = Visibility.Collapsed;
+            //boxEmpty.Visibility = Visibility.Collapsed;
         }
 
         private void handleEvent(EventMessage eventMessage)
@@ -126,11 +132,11 @@ namespace ShopUrban
         }
 
         private SideMenu currentSideMenu = null;
-        
+
         private void lbMenuItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SideMenu currentSideMenu = (SideMenu)((ListBox)sender).SelectedItem;
-            
+
             if (this.currentSideMenu != null) this.currentSideMenu.selected = false;
 
             this.currentSideMenu = currentSideMenu;
@@ -146,7 +152,7 @@ namespace ShopUrban
             switch (sideMenu.title)
             {
                 case "Orders":
-                    if(view == null) view = new OrderHistory();
+                    if (view == null) view = new OrderHistory();
                     ((OrderHistory)view).refresh();
                     break;
 

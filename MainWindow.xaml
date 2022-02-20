@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ShopUrban"
         xmlns:userCtrls="clr-namespace:ShopUrban.View.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="ShopUrban" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -21,45 +21,61 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <userCtrls:TopMenu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
-        
+        <Grid Grid.Row="0" Grid.Column="1" Visibility="Collapsed" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <userCtrls:TopMenu Grid.Column="0" Visibility="Collapsed" />
+            <userCtrls:TopMenuRight Grid.Column="1" Background="Red" HorizontalContentAlignment="Right" />
+        </Grid>
+
         <Border x:Name="sideMenu" Grid.Row="1" Grid.Column="0" Background="White">
-            <ListBox MinWidth="100" Name="lbMenuItems" 
-                     SelectionChanged="lbMenuItems_SelectionChanged"
+            <ListBox MinWidth="30" Name="lbMenuItems" SelectionChanged="lbMenuItems_SelectionChanged"
                  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
-                     Background="Transparent" Padding="0" Margin="0">
+                 Background="Transparent" Padding="0" Margin="0">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True" >
+                                <Setter Property="Background" Value="#F0F0FE" />
+                            </Trigger>
+                        </Style.Triggers>
+                        <Style.Resources>
+                            <!-- Background of selected item when not focussed 
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#F0F0FE" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#F0F0FE" />
+                            -->
+                        </Style.Resources>
                         <Setter Property="Padding" Value="0"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0">
-                            <Border Padding="10">
-                                <StackPanel >
-                                    <TextBlock Text="{Binding title}" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
+                        <Border Padding="17 13" ToolTip="{Binding title}" Cursor="Hand" Background="Transparent">
+                            <StackPanel>
+                                <materialDesign:PackIcon Kind="{Binding icon}" Foreground="#425eec"
+                                                         Height="30"/>
+                            </StackPanel>
+                        </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
-        <Border x:Name="borderProductList" Grid.Row="1" Grid.Column="1" BorderThickness="1 0 1 0" BorderBrush="#DFDFDF">
-            <Frame x:Name="menuItemFrame"></Frame>
+        <Border x:Name="borderProductList" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BorderThickness="1 0 1 0" BorderBrush="#DFDFDF">
         </Border>
+        <!--
         <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Name="borderCartSection" MinWidth="400" Background="White">
             
         </Border>
-        <Grid x:Name="boxEmpty" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2" >
+        -->
+        <Grid x:Name="boxEmpty" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" >
         </Grid>
     </Grid>
 </Window>

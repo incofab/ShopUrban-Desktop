@@ -1,5 +1,6 @@
 ﻿using ShopUrban.Model;
 using ShopUrban.Util;
+using ShopUrban.View.UserControls.Cart;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,6 +37,8 @@ namespace ShopUrban.View.UserControls
         {
             InitializeComponent();
             DataContext = this;
+
+            borderCartSection.Child = new CartSectionCtrl();
 
             this.Loaded += UserControl_Loaded;
 
@@ -101,6 +104,66 @@ namespace ShopUrban.View.UserControls
 
         private void tbSearch_KeyUp(object sender, KeyEventArgs e)
         {
+            //string searchQuery = tbSearch.Text.Trim().ToString();
+
+            //if (searchQuery.Length < 2)
+            //{
+            //    displayProducts(ShopProduct.all());
+
+            //    return;
+            //}
+
+            //List<ShopProduct> s = ShopProduct.all(searchQuery);
+
+            //if(s.Count == 1)
+            //{
+            //    var shopProduct = s[0];
+
+            //    if(shopProduct.stock_count > 0)
+            //    {
+            //        MyEventBus.post(new EventMessage(EventMessage.EVENT_ADD_TO_CART, shopProduct));
+            //    }
+            //}
+
+            //displayProducts(s);
+        }
+
+        private void handleEvent(EventMessage eventMessage)
+        {
+            switch (eventMessage.eventId)
+            {
+                case EventMessage.EVENT_SHOP_PRODUCT_UPDATED:
+                case EventMessage.EVENT_ORDER_CREATED:
+                    loadView();
+                    tbSearch.Focus();
+                    break;
+
+                case EventMessage.EVENT_ADD_TO_CART:
+
+                    tbSearch.Focus();
+
+                    if (!string.IsNullOrEmpty(tbSearch.Text)) tbSearch.Text = "";
+
+                    break;
+
+                case EventMessage.EVENT_CART_CLEARED:
+                    TimerHelper.SetTimeout(50, () => {
+                        Application.Current.Dispatcher.Invoke(new Action(() => { 
+                            tbSearch.Focus();
+                        }));
+                    });
+                    break;
+            }
+        }
+
+        private void clearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            tbSearch.Text = "";
+            //displayProducts(ShopProduct.all());
+        }
+
+        private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
             string searchQuery = tbSearch.Text.Trim().ToString();
 
             if (searchQuery.Length < 2)
@@ -112,27 +175,19 @@ namespace ShopUrban.View.UserControls
 
             List<ShopProduct> s = ShopProduct.all(searchQuery);
 
-            if(s.Count == 1)
+            if (s.Count == 1)
             {
                 var shopProduct = s[0];
 
-                if(shopProduct.stock_count > 0)
+                if (shopProduct.stock_count > 0)
                 {
                     MyEventBus.post(new EventMessage(EventMessage.EVENT_ADD_TO_CART, shopProduct));
+                    //tbSearch.Text = "";
+                    return;
                 }
             }
 
             displayProducts(s);
-        }
-
-        private void handleEvent(EventMessage eventMessage)
-        {
-            switch (eventMessage.eventId)
-            {
-                case EventMessage.EVENT_ORDER_CREATED:
-                    loadView();
-                    break;
-            }
         }
 
     }

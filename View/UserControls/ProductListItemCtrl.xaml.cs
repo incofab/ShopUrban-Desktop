@@ -81,9 +81,22 @@ namespace ShopUrban.View.UserControls
                 MessageBox.Show("Out of stock");
                 return;
             }
+
+            if(shopProduct.sell_price < 1) {
+                Helpers.playErrorSound();
+                MessageBox.Show("Please, update product price");
+                return;
+            }
+
             MyEventBus.post(new EventMessage(EventMessage.EVENT_ADD_TO_CART, shopProduct));
         }
 
+        private void btnEditShopProduct_Click(object sender, RoutedEventArgs e)
+        {
+            new EditShopProductDialog(shopProduct).ShowDialog();
+
+            updateUI();
+        }
     }
 }
 

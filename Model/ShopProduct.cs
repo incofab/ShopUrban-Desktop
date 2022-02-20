@@ -19,24 +19,30 @@ namespace ShopUrban.Model
                "cost_price decimal(8,2) DEFAULT 0," +
                "sell_price decimal(8,2) DEFAULT 0," +
                "stock_count INTEGER," +
+               "restock_alert INTEGER," +
+               "expired_date VARCHAR," +
                TIME_STAMPS_STR +
                ")";
 
         public const string table = "shop_products";
-        public static string[] fillable = { "id", "product_id", "product_unit_id", "cost_price", "sell_price", "stock_count", "created_at", "updated_at" };
+        public static string[] fillable = {
+            "id", "product_id", "product_unit_id", "cost_price", "sell_price", "stock_count",
+            "restock_alert", "expired_date", "created_at", "updated_at"
+        };
         public int id { get; set; }
         public int? product_id { get; set; }
         public int? product_unit_id { get; set; }
         public double cost_price { get; set; }
         public double sell_price { get; set; }
-        public int? stock_count { get; set; }
+        public int stock_count { get; set; }
+        public int restock_alert { get; set; }
+        public string expired_date { get; set; }
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public bool isSelected { get; set; }
         public string name {
             get {
-                return (productUnit == null ? "" : productUnit.name + " ")
-                    + (product == null ? "" : product.name);
+                return (product == null ? "" : product.name + " ") + (productUnit == null ? "" : productUnit.name);
             }
         }
         public Product product { get; set; }
@@ -85,13 +91,16 @@ namespace ShopUrban.Model
                 }
             }
         }
-        public static void update(ShopProduct shopProduct)
+        public static void update(int id, object shopProduct)
         {
+            DateTime.Now.ToString(KStrings.TIME_FORMAT);
             using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
             {
-                var updateSql = prepareUpdateQuery(table, shopProduct, new { id = shopProduct.id });
+                var updateSql = prepareUpdateQuery(table, shopProduct, new { id = id }, fillable);
 
                 cnn.Execute(updateSql, shopProduct);
+
+                //MyEventBus.post(new EventMessage(EventMessage.EVENT_SHOP_PRODUCT_UPDATED, id));
             }
         }
 
@@ -105,11 +114,11 @@ namespace ShopUrban.Model
                     $"INNER JOIN product_units ON shop_products.product_unit_id = product_units.id ";
 
                 object queryObj = null;
-
-                if(!string.IsNullOrEmpty(searchName))
+                if (!string.IsNullOrEmpty(searchName))
                 {
-                    sql += $" WHERE products.name LIKE @name ";
-                    queryObj = new { name = $"%{searchName}%" };
+                    sql += $" WHERE products.name LIKE @name OR product_units.name LIKE @name " +
+                        $" OR product_units.barcode = @barcode ";
+                    queryObj = new { name = $"%{searchName}%", barcode = searchName };
                 }
 
                 if(!string.IsNullOrEmpty(searchBarcode))

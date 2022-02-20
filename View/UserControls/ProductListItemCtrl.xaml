@@ -14,38 +14,45 @@
             <Setter Property="BorderThickness" Value="0" />
         </Style>
     </UserControl.Resources>
-    <Border Margin="5" Width="100" BorderThickness="1" BorderBrush="#BB1739E8" CornerRadius="10 10 0 0"
-            Background="White">
-        <Button Style="{StaticResource PlainButton}" Click="Button_Click"
-                Padding="0" Cursor="Hand">
-            <StackPanel Orientation="Vertical">
-                <Border Width="100" Height="90" CornerRadius="10 13 0 0" Padding="0" Margin="0 0 0 0"
-                        BorderThickness="0 0 0 1" BorderBrush="#425EEC">
-                    <Border.Background>
-                        <ImageBrush x:Name="imgProductImage" ImageSource="/logo.ico" />
-                    </Border.Background>
-                </Border>
-                <StackPanel Orientation="Vertical" Background="White">
-                    <Grid Margin="5 8 5 0" >
-                        <TextBlock Text="N10,003" Name="tbPrice" Foreground="#666666"
-                           FontSize="10" FontWeight="DemiBold" VerticalAlignment="Center" />
-                        <TextBlock Text="10 left" Name="tbStockCount" FontSize="8" Foreground="#425EEC"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
-                    </Grid>
-                    <TextBlock Text="Product Name rijois duhsuidhsi mcsdjoijsod" Margin="2 5 2 5"
-                                Name="tbProductName" HorizontalAlignment="Center" Padding="0" Height="35"
-                                FontWeight="Regular" FontSize="10" TextWrapping="Wrap" Foreground="#444444"/>
+    <Grid Margin="10">
+        <Border Width="140" BorderThickness="1" BorderBrush="#881739E8" CornerRadius="10 10 0 0"
+                Background="White">
+            <Button Style="{StaticResource PlainButton}" Click="Button_Click"
+                    Padding="0" Cursor="Hand">
+                <StackPanel Orientation="Vertical">
+                    <Border Width="140" Height="130" CornerRadius="10 13 0 0" Padding="0" Margin="0 0 0 0"
+                            BorderThickness="0 0 0 0" BorderBrush="#881739E8">
+                        <Border.Background>
+                            <ImageBrush x:Name="imgProductImage" ImageSource="/logo.ico" />
+                        </Border.Background>
+                    </Border>
+                    <StackPanel Orientation="Vertical" Background="White">
+                        <Grid Margin="5 8 5 0" >
+                            <TextBlock Text="N10,003" Name="tbPrice" Foreground="#666666"
+                               FontSize="12" FontWeight="DemiBold" VerticalAlignment="Center" />
+                            <TextBlock Text="10 left" Name="tbStockCount" FontSize="10" Foreground="#425EEC"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="Product Name rijois duhsuidhsi mcsdjoijsod" Margin="2 5 2 5"
+                                    Name="tbProductName" HorizontalAlignment="Center" Padding="0" Height="45"
+                                    FontWeight="Regular" FontSize="12" TextWrapping="Wrap" Foreground="#444444"/>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-            <!--
-            <Button.Effect>
-                <DropShadowEffect BlurRadius="10" Direction="315" RenderingBias="Quality" 
-                                                ShadowDepth="3" Color="#333333" />
-            </Button.Effect>
-            -->
+                <!--
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="10" Direction="315" RenderingBias="Quality" 
+                                                    ShadowDepth="3" Color="#333333" />
+                </Button.Effect>
+                -->
+            </Button>
+        </Border>
+        <Button x:Name="btnEditShopProduct" Style="{StaticResource plainButton}" Cursor="Hand"
+                VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#44000000"
+                Margin="0 0 5 5" Click="btnEditShopProduct_Click">
+            <materialDesign:PackIcon Kind="Edit" Foreground="{StaticResource PrimaryHueDarkBrush}" 
+                                     Height="25" Width="25" />
         </Button>
-    </Border>
-    
+    </Grid>
 </UserControl>
 
 <!--

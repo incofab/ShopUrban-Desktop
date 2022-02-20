@@ -2,6 +2,7 @@
 using ShopUrban.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,6 +40,9 @@ namespace ShopUrban.View.UserControls.Draft
 
         private void updateUI()
         {
+            //Trace.WriteLine("cartDraft.quantity = " + cartDraft.quantity);
+            //Trace.WriteLine("cartDraft.cartItems.Count = " + cartDraft.cartItems.Count);
+
             tbAmount.Text = Helpers.naira(cartDraft.amount);
             tbDate.Text = cartDraft.created_at;
             tbQuantity.Text = cartDraft.quantity + " items";
@@ -58,16 +62,15 @@ namespace ShopUrban.View.UserControls.Draft
         {
             MyEventBus.post(new EventMessage(EventMessage.EVENT_DRAFT_EDIT, cartDraft));
             
-            TimerHelper.SetTimeout(1000, () => {
+            //TimerHelper.SetTimeout(1000, () => {
                 
-                Application.Current.Dispatcher.Invoke(new Action(() => { 
+            //    Application.Current.Dispatcher.Invoke(new Action(() => { 
                     
-                    deleteCartDraft(cartDraft);
-                    Helpers.log("CartDraft deleted");
+            //        deleteCartDraft(cartDraft);
                 
-                }));
+            //    }));
 
-            });
+            //});
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)

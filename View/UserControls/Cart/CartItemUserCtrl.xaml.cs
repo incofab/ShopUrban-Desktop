@@ -73,6 +73,11 @@ namespace ShopUrban.View.UserControls.Cart
                 Helpers.playErrorSound();
                 return;
             }
+            if(newValue == 0)
+            {
+                cartSectionCtrl.removeCartItem(this);
+                return;
+            }
             cartItem.quantity = newValue;
             cartSectionCtrl.updateCartTotalPrice();
         }

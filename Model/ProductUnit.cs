@@ -79,7 +79,7 @@ namespace ShopUrban.Model
             }
         }
 
-        public static List<ProductUnit> all(string? condition = null)
+        public static List<ProductUnit> all(string condition = null)
         {
             using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
             {

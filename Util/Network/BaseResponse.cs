@@ -54,7 +54,9 @@ namespace ShopUrban.Util.Network
             List<KeyValuePair<string, string>> l)
         {
             string token = Helpers.getLoginToken();
-            
+            var shopId = Setting.getShopId();
+
+            #region Log query params on DEV
             if (KStrings.DEV)
             {
                 Trace.WriteLine("Calling: " + url);
@@ -64,6 +66,12 @@ namespace ShopUrban.Util.Network
                 {
                     Trace.WriteLine($"Param: {item.Key} = " + item.Value);
                 }
+            }
+            #endregion
+
+            if(l != null && !string.IsNullOrEmpty(shopId))
+            {
+                l.Add(new KeyValuePair<string, string>("shop_id", shopId));
             }
 
             using (var client = new HttpClient())

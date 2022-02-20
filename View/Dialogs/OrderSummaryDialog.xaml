@@ -5,22 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShopUrban.View.Dialogs"
         mc:Ignorable="d"
-        Title="Order Summary" Height="330" Width="400"
+        Title="Order Summary" MinHeight="330" Width="400"
         Icon="/logo.ico"
         WindowStartupLocation="CenterScreen"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         >
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Vertical" >
+    <StackPanel Margin="10" Orientation="Vertical">
+        <StackPanel Orientation="Vertical">
             <TextBlock Text="Payment Summary" Margin="10 5 0 5" />
             <Separator />
         </StackPanel>
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0 10 0 10">
+        <StackPanel Orientation="Vertical" Margin="0 10 0 10">
             <Grid Margin="10 10 10 0">
                 <TextBlock Text="Delivery fee" HorizontalAlignment="Left" />
                 <TextBlock x:Name="tbDeliveryFee" Text="N0" HorizontalAlignment="Right" />
@@ -33,22 +28,37 @@
                 <TextBlock Text="Total Payable" HorizontalAlignment="Left" />
                 <TextBlock x:Name="tbGrossTotalAmount" Text="N0" HorizontalAlignment="Right" />
             </Grid>
-            <Grid Margin="10 10 10 0">
+            <Grid Margin="10 10 10 10">
                 <TextBlock Text="Payment Type" HorizontalAlignment="Left" />
                 <TextBlock x:Name="tbPaymentType" Text="{Binding paymentType}" HorizontalAlignment="Right" />
             </Grid>
         </StackPanel>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
+        <Grid Margin="0 10 0 10" >
             <Button Content="Draft" Name="btnDraft" Click="btnDraft_Click" Height="28" FontSize="12" Cursor="Hand"
-                    Style="{StaticResource MaterialDesignPaperSecondaryDarkButton}" />
-            <Button Content="Cash" Name="btnCash" Click="btnCash_Click" Height="28" FontSize="12" Cursor="Hand"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}" Margin="10 0 0 0"/>
-            <Button Content="POS" Name="btnPOS" Click="btnPOS_Click" Height="28" Margin="10 0 0 0" FontSize="12" Cursor="Hand"
-                    Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}"/>
-            <Button Content="Bank Transfer" Name="btnBankTransfer" Click="btnBankTransfer_Click" Height="28" Cursor="Hand"
-                    Margin="10 0 0 0" FontSize="12" Style="{StaticResource MaterialDesignPaperDarkButton}"  />
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}" HorizontalAlignment="Left" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cash" Name="btnCash" Click="btnCash_Click" Height="28" FontSize="12" Cursor="Hand"
+                        Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}" Margin="10 0 0 0"/>
+                <Button Content="POS" Name="btnPOS" Click="btnPOS_Click" Height="28" Margin="10 0 0 0" FontSize="12" Cursor="Hand"
+                        Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}"/>
+                <Button Content="Bank Transfer" Name="btnBankTransfer" Click="btnBankTransfer_Click" Height="28" Cursor="Hand"
+                        Margin="10 0 0 0" FontSize="12" Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}"  />
+            </StackPanel>
+        </Grid>
+        <StackPanel Orientation="Vertical" Margin="10 5 10 5">
+            <TextBox Text="" Name="tbCustomerPhoneNo" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     materialDesign:HintAssist.Hint="Customer Phone number"
+                     materialDesign:HintAssist.Foreground="Red"
+                     materialDesign:HintAssist.HelperText="Customer's phone number, eg: 09034302172"
+                     materialDesign:HintAssist.IsFloating="True" />
+            <TextBox Text="" Name="tbCustomerName" Margin="0 20 0 0" 
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     materialDesign:HintAssist.Hint="Customer Name [optional]"
+                     materialDesign:HintAssist.Foreground="Red"
+                     materialDesign:HintAssist.HelperText="Optionally include name that will appear on the receipt"
+                     materialDesign:HintAssist.IsFloating="True" />
         </StackPanel>
-        <Grid Grid.Row="3" Margin="10 15 10 10">
+        <Grid Grid.Row="3" Margin="10 25 10 10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5*" />
                 <ColumnDefinition Width="7*" />
@@ -57,5 +67,5 @@
             <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedButton}" Margin="15 0 0 0"
                     Cursor="Hand" Name="btnConfirm" Click="btnConfirm_Click">Confirm</Button>
         </Grid>
-    </Grid>
+    </StackPanel>
 </Window>

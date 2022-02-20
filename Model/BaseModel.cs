@@ -43,7 +43,7 @@ namespace ShopUrban.Model
             return query;
         }
 
-        public static string prepareInsertQuery(string table, object c, string[]? fillable = null)
+        public static string prepareInsertQuery(string table, object c, string[] fillable = null)
         {
             var query = "";
             var queryValues = "";

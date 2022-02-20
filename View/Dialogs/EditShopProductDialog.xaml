@@ -1,0 +1,105 @@
+﻿<Window x:Class="ShopUrban.View.Dialogs.EditShopProductDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShopUrban.View.Dialogs"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d"
+        Title="Edit Product" Height="500" Width="600">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="15">
+                <TextBlock Text="Update Stock and Product Details" HorizontalAlignment="Center" FontSize="17"
+                           FontWeight="Bold" Margin="0 5 0 10"/>
+                <TextBlock FontSize="16">
+                    <TextBlock Text="Product" FontWeight="SemiBold" Width="120" />
+                    <TextBlock Text="{Binding shopProduct.name}" />
+                </TextBlock>
+                <TextBlock FontSize="16" Margin="0 10 0 0">
+                    <TextBlock Text="Available Stock" FontWeight="SemiBold" Width="120" />
+                    <TextBlock x:Name="tbStockCountText" Text="{Binding shopProduct.stock_count}" />
+                </TextBlock>
+                <Border Background="#FDFDFD" Padding="20" BorderThickness="1" BorderBrush="#DFDFDF"
+                        CornerRadius="10" Margin="0 15 0 0">
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="" Name="tbStockCountToUpdate" 
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Add/Remove Stock" materialDesign:HintAssist.IsFloating="True" 
+                                     KeyUp="tbStockCountToUpdate_KeyUp" Margin="0 0 10 0"
+                                     />
+                            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 0 0">
+                                <TextBlock Text="Stock Action" Margin="0 0 0 5" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox x:Name="cbIncrease" Content="Increase" IsChecked="True" 
+                                          HorizontalAlignment="Left" Click="cbIncrease_Click" />
+                                    <CheckBox x:Name="cbDecrease" Content="Decrease" IsChecked="false" 
+                                          HorizontalAlignment="Right" Click="cbDecrease_Click" Grid.Column="1" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                        <TextBox Text="" Name="tbReason" Margin="0 5 0 10"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Reason [optional]" 
+                                 materialDesign:HintAssist.HelperText="Optionally state the reason for this stock update"
+                                 materialDesign:HintAssist.IsFloating="True" 
+                                 />
+                        <Button x:Name="btnUpdateStock" Click="btnUpdateStock_Click" Width="150" Margin="0 30 0 0"
+                             Style="{StaticResource MaterialDesignRaisedButton}">Update Stock</Button>
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="20" Margin="0 20 0 0" Background="#FDFDFD" BorderBrush="#DFDFDF" BorderThickness="1" 
+                        CornerRadius="10">
+                    <StackPanel Orientation="Vertical" >
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding shopProduct.sell_price}" 
+                                     Name="tbSellPrice" Margin="0 0 10 0"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Sell Price" materialDesign:HintAssist.IsFloating="True" 
+                                     />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding shopProduct.cost_price}" 
+                                     Name="tbCostPrice" Margin="10 0 0 0"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Cost Price" 
+                                     materialDesign:HintAssist.IsFloating="True" 
+                                     />
+                            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding shopProduct.restock_alert}" 
+                                     Name="tbRestockAlert" Margin="0 15 10 0"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Restock Alert" materialDesign:HintAssist.IsFloating="True"
+                                     materialDesign:HintAssist.HelperText="The stock level at which you will be notified to restock" 
+                                     />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding shopProduct.expired_date}" 
+                                     Name="tbExpiredDate" Margin="10 15 0 0"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Expiry Date (Format: YYYY-MM-DD)" materialDesign:HintAssist.IsFloating="True"
+                                     />
+                        </Grid>
+                        <Button x:Name="btnUpdateProduct" Click="btnUpdateProduct_Click" Width="150" 
+                                Margin="0 30 0 0"
+                                 Style="{StaticResource MaterialDesignRaisedButton}">Update Product</Button>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

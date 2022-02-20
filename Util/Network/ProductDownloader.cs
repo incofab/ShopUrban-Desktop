@@ -58,7 +58,8 @@ namespace ShopUrban.Util.Network
             return shopProducts;
         }
 
-        public async Task<string> downloadImage(string imgUrl, Func<int, int>? action = null)
+        #region downloadImage [Not Used]
+        public async Task<string> downloadImage(string imgUrl, Func<int, int> action = null)
         {
             Uri uri = new Uri(imgUrl);
 
@@ -70,8 +71,9 @@ namespace ShopUrban.Util.Network
             if (File.Exists(filepath))
             {
                 Helpers.log($"Image ({filename}) File already exists");
-                File.Delete(filepath);
-                filepath = imagesFolder + $"{new Random().Next(10000, 99999)}-{filename}";
+                return filepath;
+                //File.Delete(filepath);
+                //filepath = imagesFolder + $"{new Random().Next(10000, 99999)}-{filename}";
             }
 
             using (var client = new HttpClient())
@@ -81,7 +83,9 @@ namespace ShopUrban.Util.Network
 
             return filepath;
         }
+        #endregion
 
+        #region DownloadAsync
         //public static async Task DownloadAsync(Uri requestUri, string filename)
         //{
         //    if (filename == null)
@@ -101,7 +105,9 @@ namespace ShopUrban.Util.Network
         //        }
         //    }
         //}
-        public string downloadProductImage(string imgUrl, Func<int, int>? action = null)
+        #endregion
+
+        public string downloadProductImage(string imgUrl, Func<int, int> action = null)
         {
             if (imgUrl == null) return null;
 
@@ -154,11 +160,12 @@ namespace ShopUrban.Util.Network
 
         public async Task<BaseResponse> uploadOrders(bool showMessageIfEmpty = true)
         {
-            int.TryParse(Setting.getValue(Setting.KEY_ORDER_LAST_SYNC_ID), out int orderLastId);
+            //int.TryParse(Setting.getValue(Setting.KEY_ORDER_LAST_SYNC_ID), out int orderLastId);
+
+            //List<Order> orders = Order.all(orderLastId);
+            List<Order> orders = Order.getUnUploadedOrders();
 
             string shopId = Setting.getShopId();
-
-            List<Order> orders = Order.all(orderLastId);
 
             if(orders == null || orders.Count < 1)
             {

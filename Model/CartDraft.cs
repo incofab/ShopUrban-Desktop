@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -34,8 +35,10 @@ namespace ShopUrban.Model
                 foreach (var cartDraft in cartDrafts)
                 {
                     var sql = $" SELECT * FROM {CartItemDraft.table} " +
-                    $" LEFT JOIN shop_products ON cart_item_drafts.shop_product_id = shop_products.id ";
+                    $" LEFT JOIN shop_products ON cart_item_drafts.shop_product_id = shop_products.id " +
+                    $" WHERE {CartItemDraft.table}.cart_id = @cart_id";
 
+                    var obj = new { cart_id = cartDraft.id };
                     //Helpers.log("SQL Query = " + sql);
                     var cartItemDrafts = cnn.Query<CartItemDraft, ShopProduct, CartItemDraft>
                         (sql, (cartItemDraft, shopProduct) =>
@@ -44,7 +47,7 @@ namespace ShopUrban.Model
 
                             return cartItemDraft;
 
-                        }, splitOn: "id").ToList<CartItemDraft>();
+                        }, obj, splitOn: "id").ToList<CartItemDraft>();
 
                     cartDraft.cartItems = cartItemDrafts;
                 }
@@ -108,12 +111,17 @@ namespace ShopUrban.Model
             using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
             {
                 var deleteObj = new { id = cart.id };
+                var deleteObj2 = new { cart_id = cart.id };
+
                 var deleteSql = deleteQuery(CartDraft.table, deleteObj);
+
+                //Trace.WriteLine("deleteSql = " + deleteSql);
 
                 cnn.Execute(deleteSql, deleteObj);
 
-                var deleteObj2 = new { cart_id = cart.id };
                 var deleteCartItemDraftSql = deleteQuery(CartItemDraft.table, deleteObj2);
+
+                //Trace.WriteLine("deleteCartItemDraftSql = " + deleteCartItemDraftSql);
 
                 cnn.Execute(deleteCartItemDraftSql, deleteObj2);
             }

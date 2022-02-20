@@ -6,17 +6,18 @@
              xmlns:local="clr-namespace:ShopUrban.View.UserControls.Cart"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="450"
-             Background="GreenYellow"
-            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-            FontFamily="{materialDesign:MaterialDesignFont}"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             FontFamily="{materialDesign:MaterialDesignFont}"
+             Background="White"
              >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="5 5 5 5">
+        <Grid Grid.Row="0" Margin="8 10 8 10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
@@ -24,11 +25,12 @@
             </Grid.ColumnDefinitions>
             <Image Source="/shop_urban_name.png" Grid.Column="0" Width="180" />
             <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <TextBlock x:Name="tbStaffName" Text="Staff Name" Foreground="#404040" FontSize="8" FontWeight="DemiBold" />
+                <TextBlock x:Name="tbStaffName" Text="{Binding staff.name}" Foreground="#404040" FontSize="8" FontWeight="DemiBold" />
                 <TextBlock x:Name="tbRole" Text="Admin Account" Foreground="#AEAEAE" FontSize="7" />
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1" x:Name="cartBox" Visibility="Visible">
+        <Separator Grid.Row="1" Background="#22000000" />
+        <Grid Grid.Row="2" x:Name="cartBox" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -38,6 +40,10 @@
                 <StackPanel Orientation="Vertical" Margin="5 0" x:Name="cartItemContainer" ></StackPanel>
             </ScrollViewer>
             <StackPanel Grid.Row="1" Orientation="Vertical" Margin="15 0">
+                <Button x:Name="btnClearCart" Style="{StaticResource plainButton}" Cursor="Hand" HorizontalAlignment="Right" 
+                        Padding="3" Click="btnClearCart_Click" >
+                    <TextBlock Text="Clear cart" Foreground="Red" FontSize="9" />
+                </Button>
                 <Grid Visibility="Collapsed">
                     <TextBlock x:Name="tbCartTotalPrice" Text="{Binding cartTotalPrice}" HorizontalAlignment="Right" />
                 </Grid>
@@ -59,7 +65,7 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <StackPanel Grid.Row="0" Grid.RowSpan="2" x:Name="boxCartEmpty" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Grid.Row="0" Grid.RowSpan="3" x:Name="boxCartEmpty" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="/logo.ico" Width="100" Height="100" Opacity="0.4" />
             <TextBlock Text="Cart Empty" VerticalAlignment="Center" 
                     HorizontalAlignment="Center" FontSize="16" Margin="0 10 0 0" />

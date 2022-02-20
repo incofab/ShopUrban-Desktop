@@ -16,16 +16,24 @@ namespace ShopUrban.Model
             "quantity INT(6)," +
             "amount decimal(8,2) DEFAULT 0," +
             "status VARCHAR(30)," +
+            "created_for VARCHAR," +
+            "customer_name VARCHAR," +
             TIME_STAMPS +
             ")";
 
-        public static string[] fillable = { "quantity", "amount", "status"};
+        public static string[] fillable = { "quantity", "amount", "status", "created_for", "customer_name" };
 
         const string table = "carts";
         public int id { get; set; }
         public int quantity {get; set; }
         public double amount { get; set; }
         public string status { get; set; }
+        /// <summary>
+        /// This should be the phone number of the customer that owns this order. 
+        /// In the server, this will translate to the customer's user ID
+        /// </summary>
+        public string created_for { get; set; }
+        public string customer_name { get; set; }
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public string amountNaira { get { return Helpers.naira(amount); } }

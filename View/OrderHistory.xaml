@@ -13,19 +13,24 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid Name="dataGrid" AlternatingRowBackground="LightBlue" Grid.Row="0"
+        <Border Grid.Row="0" Background="#ededfb" BorderThickness="0 0 0 0" BorderBrush="Gray" >
+            <TextBlock Text="Orders" FontSize="20" Margin="10 5"  />
+        </Border>
+        <DataGrid Name="dataGrid" AlternatingRowBackground="LightBlue" Grid.Row="1"
             AlternationCount="2" AutoGenerateColumns="False" ItemsSource="{Binding orders}"
             SelectionChanged="dataGrid_SelectionChanged" IsReadOnly="True" MouseDoubleClick="dataGrid_MouseDoubleClick" >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Date" Binding="{Binding created_at}" />
-                <DataGridTextColumn Header="Staff" Binding="{Binding staff.name}" />
+                <DataGridTextColumn Header="Date Sold" Binding="{Binding created_at}" />
+                <DataGridTextColumn Header="Sold By" Binding="{Binding staff.name}" />
                 <DataGridTextColumn Header="Order Number" Binding="{Binding order_number}" />
-                <DataGridTextColumn Header="Amount" Binding="{Binding amountNaira}" />
-                <DataGridTextColumn Header="Amount to pay" Binding="{Binding amount_to_pay, Converter={StaticResource nairaConverter}}" />
-                <DataGridTextColumn Header="Quantity" Binding="{Binding cart.quantity}" />
+                <!--<DataGridTextColumn Header="Amount" Binding="{Binding amountNaira}" />-->
+                <DataGridTextColumn Header="Amount" Binding="{Binding amount_to_pay, Converter={StaticResource nairaConverter}}" />
+                <DataGridTextColumn Header="Balance" Binding="{Binding remaining_amount, Converter={StaticResource nairaConverter}}" />
+                <DataGridTextColumn Header="Qty Items Sold" Binding="{Binding cart.quantity}" />
                 <DataGridTextColumn Header="Status" Binding="{Binding status}"  />
             </DataGrid.Columns>
         </DataGrid>

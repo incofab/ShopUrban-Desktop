@@ -38,6 +38,7 @@ namespace ShopUrban.View.UserControls.Cart
                 typeof(CartSectionCtrl), new PropertyMetadata(""));
 
         public double shippingCost { get; set; }
+        public Staff staff { get; set; }
 
         public CartSectionCtrl()
         {
@@ -55,6 +56,8 @@ namespace ShopUrban.View.UserControls.Cart
             clearCart();
 
             MyEventBus.subscribe(handleEvent);
+
+            staff = Helpers.getLoggedInStaff();
         }
 
         void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -78,10 +81,15 @@ namespace ShopUrban.View.UserControls.Cart
             {
                 cartItemCtrl.Value.cartItem.shopProduct.isSelected = false;
 
-                cartItemCtrls.Remove(cartItemCtrl.Key);
+                //Don't modify dictionary inside a loop
+                //cartItemCtrls.Remove(cartItemCtrl.Key);
             }
+            
+            cartItemCtrls.Clear();
 
             updateUI();
+
+            MyEventBus.post(new EventMessage(EventMessage.EVENT_CART_CLEARED));
         }
 
         private void updateUI()
@@ -125,7 +133,8 @@ namespace ShopUrban.View.UserControls.Cart
         {
             if (cartItemCtrls.ContainsKey(shopProduct.id))
             {
-                cartItemCtrls.GetValueOrDefault(shopProduct.id).increaseQuantity();
+                cartItemCtrls[shopProduct.id].increaseQuantity();
+                //cartItemCtrls. GetValueOrDefault(shopProduct.id).increaseQuantity();
                 return;
             }
 
@@ -144,6 +153,7 @@ namespace ShopUrban.View.UserControls.Cart
 
         private void addCartDraft(CartDraft cartDraft)
         {
+            //Trace.WriteLine(cartDraft.ToString());
             foreach (CartItem cartItemDraft in cartDraft.cartItems)
             {
                 List<ShopProduct> shopProducts = ShopProduct.all(null, null, cartItemDraft.shop_product_id);
@@ -151,6 +161,9 @@ namespace ShopUrban.View.UserControls.Cart
                 if (shopProducts.Count != 1) continue;
 
                 cartItemDraft.shopProduct = shopProducts[0];
+
+                //Trace.WriteLine(cartItemDraft.ToString());
+                //Trace.WriteLine("cartItemDraft.shopProduct.id = "+ cartItemDraft.shopProduct.id);
 
                 cartItemCtrls.Add(cartItemDraft.shopProduct.id, new CartItemUserCtrl(this, cartItemDraft));
             }
@@ -233,5 +246,9 @@ namespace ShopUrban.View.UserControls.Cart
             CartDraft.saveRecords(cartItemsArr);
         }
 
+        private void btnClearCart_Click(object sender, RoutedEventArgs e)
+        {
+            clearCart();
+        }
     }
 }

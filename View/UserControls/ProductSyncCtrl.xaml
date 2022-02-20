@@ -14,16 +14,17 @@
              FontFamily="{materialDesign:MaterialDesignFont}"
              >
     <Grid Background="{StaticResource AttentionToActionBrush}">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel x:Name="syncBox"
                 Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock x:Name="tbSyncText" >
                     Records Empty Synchronize Now
                 </TextBlock>
-                <Button x:Name="btnSync" Margin="0 15 0 0" Click="DownloadButton_Click" Width="150">
+                <Button x:Name="btnSync" Margin="0 15 0 0" Click="DownloadButton_Click" Width="250">
                     Synchronize
                 </Button>
             </StackPanel>
+            <Separator Margin="0 20 0 20" />
             <StackPanel x:Name="imagesLoadingBox" Visibility="Visible" Margin="30 0 0 0"
                 Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock x:Name="tbImageSyncText" HorizontalAlignment="Center">Synchronize your product images to this computer</TextBlock>
@@ -31,10 +32,11 @@
                              Margin="0 10 0 10" Width="200" Height="10"/>
                 <TextBlock x:Name="tbProgress" HorizontalAlignment="Center">0/0</TextBlock>
                 <Button x:Name="btnSyncImages" Click="btnSyncImages_Click" Margin="0 10 0 0"
-                        Width="150">Download Images</Button>
+                        Width="150" Visibility="Collapsed">Download Images</Button>
                 <Button x:Name="btnSkipImageSync" Click="btnSkipImageSync_Click" Margin="0 10 0 0" FontSize="12"
                         FontWeight="Normal" Foreground="{StaticResource PrimaryHueMidBrush}"
-                        Style="{StaticResource plainButton}" Cursor="Hand">Skip Image Download</Button>
+                        Style="{StaticResource plainButton}" Cursor="Hand" Visibility="Collapsed"
+                        >Skip Image Download</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

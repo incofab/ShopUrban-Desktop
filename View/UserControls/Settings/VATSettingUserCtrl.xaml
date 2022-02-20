@@ -12,7 +12,16 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Text="VAT (in %)" Margin="0 0 20 0" />
-        <TextBox Grid.Column="1" Text="0" Name="tbVAT" LostFocus="tbVAT_LostFocus" Padding="0" />
+        <TextBlock Grid.Column="0" Text="VAT (in %)" Margin="0 0 20 0" VerticalAlignment="Center" />
+        <TextBox Grid.Column="1" Width="70" Text="0" Name="tbVAT" LostFocus="tbVAT_LostFocus" Padding="5 5"
+                 HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                 Height="25"
+                 >
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </TextBox.Style>
+        </TextBox>
     </Grid>
 </UserControl>

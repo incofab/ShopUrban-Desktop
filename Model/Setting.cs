@@ -60,6 +60,8 @@ namespace ShopUrban.Model
         }
         public static void createOrUpdate(Setting setting)
         {
+            DateTime.Now.ToString(KStrings.TIME_FORMAT);
+
             using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
             {
                 object queryObject = new { key = setting.key };

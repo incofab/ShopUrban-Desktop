@@ -16,6 +16,8 @@ namespace ShopUrban.Model
         public const int EVENT_DRAFT_CREATED = 6;
         public const int EVENT_DRAFT_DELETED = 7;
         public const int EVENT_DRAFT_EDIT = 8;
+        public const int EVENT_CART_CLEARED = 9;
+        public const int EVENT_SHOP_PRODUCT_UPDATED = 10;
 
         public int eventId
         {
@@ -33,6 +35,8 @@ namespace ShopUrban.Model
             private set;
         }
 
+        public EventMessage(int eventId): this(eventId, null){ }
+
         public EventMessage(int eventId, object data)
         {
             this.eventId = eventId;
@@ -44,6 +48,5 @@ namespace ShopUrban.Model
             this.data = data;
             this.message = message;
         }
-        
     }
 }

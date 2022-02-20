@@ -9,6 +9,7 @@ using System.Media;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
@@ -199,6 +200,25 @@ namespace ShopUrban.Util
         {
             playSound(Environment.CurrentDirectory + @"/buzz.wav");
         }
+        public static bool IsPhoneNumberValid(string number)
+        {
+            //return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
+            return Regex.Match(number, @"^[0][0-9]{10}$").Success;
+        }
+        public static string getVersionNo()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+            return fileVersionInfo.FileVersion;
+        }
+
+        public static void openUrl(string url)
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+
         public static void showReceipt(Order order)
         {
             var layout = Setting.getValue(Setting.KEY_RECEIPT_LAYOUT);

@@ -56,6 +56,14 @@ namespace ShopUrban.View.Dialogs
 
         private void btnConfirm_Click(object sender, RoutedEventArgs e)
         {
+            string customerPhoneNo = tbCustomerPhoneNo.Text.Trim();
+
+            if (!string.IsNullOrEmpty(customerPhoneNo) && !Helpers.IsPhoneNumberValid(customerPhoneNo))
+            {
+                MessageBox.Show("Enter a valid phone number");
+                return;
+            }
+
             double amountPaid = grossTotalAmount;
             double.TryParse(tboxAmountPaid.Text, out amountPaid);
 
@@ -72,12 +80,15 @@ namespace ShopUrban.View.Dialogs
                 staff_id = staff.id,
                 user_id = staff.user_id,
                 vat_amount = VATamount,
+                customer_name = tbCustomerName.Text,
             };
 
             Cart cart = new Cart {
                 amount = cartTotalAmount,
                 quantity = cartTotalQuantity,
-                status = "1"
+                status = "1",
+                customer_name = tbCustomerName.Text,
+                created_for = customerPhoneNo,
             };
 
             //Save records to DB

@@ -29,7 +29,7 @@ namespace ShopUrban.View.UserControls.Draft
         // Using a DependencyProperty as the backing store for cartDrafts.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty cartDraftsProperty =
             DependencyProperty.Register("cartDrafts", typeof(List<CartDraft>), 
-                typeof(DraftItemUserCtrl), new PropertyMetadata(null));
+                typeof(DraftUserCtrl), new PropertyMetadata(null));
 
         public DraftUserCtrl()
         {
