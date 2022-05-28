@@ -12,6 +12,7 @@ namespace ShopUrban.Model
 {
     public class Order :BaseModel
     {
+        //Channel should be added in the next DB update
         public const string CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `orders` (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "cart_id INTEGER," +
@@ -28,13 +29,14 @@ namespace ShopUrban.Model
             "remaining_amount decimal(8,2) DEFAULT 0," +
             "vat_amount decimal(8,2) DEFAULT 0," +
             "customer_name VARCHAR," +
+            "channel VARCHAR(30)," +
             TIME_STAMPS +
             ")";
 
         public static string[] fillable = {
             "cart_id", "staff_id", "user_id", "order_number", "amount", "status", "shipping_cost",
             "total_cost_price", "profit", "amount_to_pay", "amount_paid", "remaining_amount", "vat_amount",
-            "customer_name",
+            "customer_name", "channel",
         };
 
         const string table = "orders";
@@ -43,93 +45,106 @@ namespace ShopUrban.Model
         public int user_id { get; set; }
         public int staff_id { get; set; }
         public string order_number { get; set; }
-        public double amount { get; set; }
-        public double shipping_cost { get; set; }
+        public decimal amount { get; set; }
+        public decimal shipping_cost { get; set; }
         public string status { get; set; }
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public string amountNaira { get { return Helpers.naira(amount); } }
         //public double totalAmount { get { return amount + shipping_cost; } }
         public string totalAmountNaira { get { return Helpers.naira(amount_to_pay); } }
-        public double total_cost_price { get; set; }
-        public double profit { get; set; }
-        public double amount_to_pay { get; set; }
-        public double amount_paid { get; set; }
-        public double remaining_amount { get; set; }
-        public double vat_amount { get; set; }
+        public decimal total_cost_price { get; set; }
+        public decimal profit { get; set; }
+        public decimal amount_to_pay { get; set; }
+        public decimal amount_paid { get; set; }
+        public decimal remaining_amount { get; set; }
+        public decimal vat_amount { get; set; }
         public string amountPaidNaira { get { return Helpers.naira(amount_paid); } }
         public string remainingAmountNaira { get { return Helpers.naira(remaining_amount); } }
         public string customer_name { get; set; }
+        public string channel { get; set; }
         public Cart cart { get; set; }
+        [JsonProperty(propertyName: "payments")]
         public List<OrderPayment> orderPayments { get; set; }
         public Staff staff { get; set; }
+        public User user { get; set; }
 
         public static List<Order> all(int lastOrderId = 0, string orderBy = "ASC")
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                object queryObject = new { id = lastOrderId };
+            var cnn = DBCreator.getConn();
 
-                //var sql = $" SELECT orders.*, carts.*, staff.* FROM {table} " +
-                var sql = $" SELECT * FROM {table} " +
-                $" LEFT JOIN carts ON orders.cart_id = carts.id " +
-                $" LEFT JOIN staff ON orders.staff_id = staff.id " +
-                //$" LEFT JOIN order_payments ON orders.order_number = order_payments.order_number_track " +
-                $" WHERE orders.id > @id ORDER BY orders.id {orderBy}";
+            object queryObject = new { id = lastOrderId };
 
-                //Helpers.log("Order Query = " + sql);
-                var orderList = cnn.Query<Order, Cart, Staff, Order>
-                    (sql, (order, cart, staff) =>
-                    {
-                        order.cart = cart;
-                        order.staff = staff;
-                        //Helpers.log("Order " + order.order_number);
-                        //Helpers.log(JsonConvert.SerializeObject(order));
+            //var sql = $" SELECT orders.*, carts.*, staff.* FROM {table} " +
+            var sql = $" SELECT * FROM {table} " +
+            $" LEFT JOIN carts ON orders.cart_id = carts.id " +
+            $" LEFT JOIN staff ON orders.staff_id = staff.id " +
+            //$" LEFT JOIN order_payments ON orders.order_number = order_payments.order_number_track " +
+            $" WHERE orders.id > @id ORDER BY orders.id {orderBy}";
 
-                        //if (order.orderPayments == null) order.orderPayments = new List<OrderPayment>();
-                        //order.orderPayments.Add(orderPayment);
-
-                        return order;
-
-                    }, queryObject, splitOn: "id").ToList<Order>();
-
-                //Helpers.log("OrderList Count = " + orderList.Count);
-                //List<Order> orderList = query.ToList<Order>();
-
-                if (orderList == null) return null;
-
-                foreach (var order in orderList)
+            //Helpers.log("Order Query = " + sql);
+            var orderList = cnn.Query<Order, Cart, Staff, Order>
+                (sql, (order, cart, staff) =>
                 {
-                    if (order.cart == null) continue;
+                    order.cart = cart;
+                    order.staff = staff;
+                    //Helpers.log("Order " + order.order_number);
+                    //Helpers.log(JsonConvert.SerializeObject(order));
 
-                    var sql2 = $"SELECT * FROM cart_items WHERE cart_id = @cart_id";
-                    object queryObject2 = new { cart_id = order.cart.id };
+                    //if (order.orderPayments == null) order.orderPayments = new List<OrderPayment>();
+                    //order.orderPayments.Add(orderPayment);
 
-                    order.cart.cartItems = cnn.Query<CartItem>(sql2, queryObject2).ToList();
+                    return order;
 
-                    var sql3 = $"SELECT * FROM order_payments WHERE order_number_track = @order_number_track";
-                    object queryObject3 = new { order_number_track = order.order_number };
+                }, queryObject, splitOn: "id").ToList<Order>();
 
-                    order.orderPayments = cnn.Query<OrderPayment>(sql3, queryObject3).ToList();
-                }
+            //Helpers.log("OrderList Count = " + orderList.Count);
+            //List<Order> orderList = query.ToList<Order>();
 
-                //var query = cnn.Query<Order>(sql);
-                return orderList;
+            if (orderList == null) return null;
+
+            foreach (var order in orderList)
+            {
+                if (order.cart == null) continue;
+
+                var sql2 = $"SELECT * FROM cart_items WHERE cart_id = @cart_id";
+                object queryObject2 = new { cart_id = order.cart.id };
+
+                order.cart.cartItems = cnn.Query<CartItem>(sql2, queryObject2).ToList();
+
+                var sql3 = $"SELECT * FROM order_payments WHERE order_number_track = @order_number_track";
+                object queryObject3 = new { order_number_track = order.order_number };
+
+                order.orderPayments = cnn.Query<OrderPayment>(sql3, queryObject3).ToList();
             }
+
+            return orderList;
         }
 
         public static Order create(Order order)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, order, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, order);
+            var insertSql = prepareInsertQuery(table, order, fillable);
 
-                var sql = $"SELECT * FROM {table} ORDER BY id DESC LIMIT 1";
+            cnn.Execute(insertSql, order);
 
-                return cnn.Query<Order>(sql).First();
-            }
+            var sql = $"SELECT * FROM {table} ORDER BY id DESC LIMIT 1";
+
+            return cnn.Query<Order>(sql).First();
+        }
+
+        public static Order getByOrderNumber(string orderNumber)
+        {
+            var cnn = DBCreator.getConn();
+
+            object queryObject = new { order_number = orderNumber };
+
+            var whereQuery = prepareEqQuery(queryObject);
+
+            var query = cnn.Query<Order>($"SELECT * FROM {table} {whereQuery}", queryObject).ToList();
+
+            return (query.Count < 1) ? null : query.First();
         }
 
         public static string generateInvoiceNo()
@@ -139,13 +154,12 @@ namespace ShopUrban.Model
             var orderNumber = DateTime.Now.Year.ToString().Substring(2)+"00"
                 + rand.Next(100000, 999999);
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            var cnn = DBCreator.getConn();
+
+            while (InvoiceNoExists(cnn, orderNumber))
             {
-                while (InvoiceNoExists(cnn, orderNumber))
-                {
-                    orderNumber = DateTime.Now.Year.ToString().Substring(2)+"00"
-                        + rand.Next(100000, 999999);
-                }
+                orderNumber = DateTime.Now.Year.ToString().Substring(2)+"00"
+                    + rand.Next(100000, 999999);
             }
 
             return orderNumber;

@@ -3,6 +3,7 @@ using ShopUrban.Util;
 using ShopUrban.Util.Network;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace ShopUrban.View.Dialogs
             this.shopProduct = shopProduct;
             updateShopProductObject = new UpdateShopProductObject();
 
-            tbStockCountToUpdate.Text = shopProduct.stock_count + "";
+            tbStockCountToUpdate.Text = "0";
         }
 
         private void btnUpdateProduct_Click(object sender, RoutedEventArgs e)
@@ -42,9 +43,15 @@ namespace ShopUrban.View.Dialogs
 
             setProductUpdateLoading(true);
 
-            float.TryParse(tbCostPrice.Text.Trim(), out float costPrice);
-            float.TryParse(tbSellPrice.Text.Trim(), out float sellPrice);
+            decimal.TryParse(tbCostPrice.Text.Trim(), out decimal costPrice);
+            decimal.TryParse(tbSellPrice.Text.Trim(), out decimal sellPrice);
             int.TryParse(tbRestockAlert.Text.Trim(), out int restockAlert);
+
+            if(costPrice > sellPrice)
+            {
+                MessageBox.Show("Cost Price cannot be greater than selling price");
+                return;
+            }
 
             updateShopProductObject.id = shopProduct.id;
             updateShopProductObject.cost_price = costPrice;
@@ -103,11 +110,17 @@ namespace ShopUrban.View.Dialogs
         {
             if (isStockUpdateLoading) return;
             
-            setStockUpdateLoading(true);
-
             int.TryParse(tbStockCountToUpdate.Text.Trim(), out int quantity);
 
             quantity = Math.Abs(quantity);
+
+            if (quantity < 1)
+            {
+                MessageBox.Show("Enter a valid number");
+                return;
+            }
+            
+            setStockUpdateLoading(true);
 
             var updated_stock_count = string.IsNullOrEmpty(quantityPrefix)
                     ? shopProduct.stock_count + quantity
@@ -123,7 +136,7 @@ namespace ShopUrban.View.Dialogs
             l.Add(new KeyValuePair<string, string>("quantity", quantity+""));
             l.Add(new KeyValuePair<string, string>("shop_product_id", shopProduct.id + ""));
 
-            processStockAction(l, updated_stock_count);
+            processStockAction(l, (int)updated_stock_count);
         }
 
         private async void processStockAction(List<KeyValuePair<string, string>> l, int updated_stock_count)
@@ -147,7 +160,10 @@ namespace ShopUrban.View.Dialogs
 
             shopProduct.stock_count = updated_stock_count;
 
-            MessageBox.Show("Product stock count updated");
+            tbStockCountToUpdate.Text = "0";
+            tbStockCountText.Text = updated_stock_count+"";
+
+            Toast.showSuccess("Product stock count updated");
 
             if (shopProduct.sell_price > 0) DialogResult = true;
         }
@@ -163,8 +179,8 @@ namespace ShopUrban.View.Dialogs
         private class UpdateShopProductObject
         {
             public int id { get;  set; }
-            public float cost_price { get;  set; }
-            public float sell_price { get;  set; }
+            public decimal cost_price { get;  set; }
+            public decimal sell_price { get;  set; }
             public int restock_alert { get;  set; }
             public string expired_date { get;  set; }
         }
@@ -207,6 +223,41 @@ namespace ShopUrban.View.Dialogs
             if (text.Length < 1) return;
 
             updateCB(text.StartsWith("-") ? "-" : "");
+        }
+
+        public string stockCount { get; set; }
+
+        private void tb_input_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if ("0".Equals(tb.Text.Trim()))
+            {
+                tb.Text = "";
+            }
+        }
+
+        private void tb_input_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (string.IsNullOrEmpty(tb.Text.Trim()))
+            {
+                tb.Text = "0";
+            }
+        }
+    }
+    public class StockUpdateValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            try
+            {
+                Int64.Parse(value+"");
+                return new ValidationResult(true, null);
+            }
+            catch (Exception e)
+            {
+                return new ValidationResult(false, "Only valid numbers are allowed");
+            }
         }
     }
 

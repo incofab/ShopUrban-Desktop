@@ -11,6 +11,7 @@ using System.Windows;
 
 namespace ShopUrban.Util.Network
 {
+    [Obsolete("Downloads and updates have been moved to SynchronizeShopProduct class")]
     class ProductDownloader
     {
         public static string imagesFolder = KStrings.BASE_FOLDER + "products\\images\\";
@@ -32,10 +33,10 @@ namespace ShopUrban.Util.Network
         }
 
         private Func<int, int> action;
-        public async Task<List<Product>> loadProducts()
+        public async Task<List<Product>> loadProducts(string lastSync)
         {
-            var shopId = Setting.getShopId();
-            string lastSync = Setting.getValue(Setting.KEY_PRODUCT_LAST_SYNC_SERVER);
+            var shopId = Helpers.getCurrentShop()?.id + "";
+            //string lastSync = Setting.getValue(Setting.KEY_PRODUCT_LAST_SYNC_SERVER);
 
             List<KeyValuePair<string, string>> l = new List<KeyValuePair<string, string>>();
 
@@ -46,66 +47,21 @@ namespace ShopUrban.Util.Network
 
             if (baseResponse == null || baseResponse.status != "success")
             {
-                MessageBox.Show((baseResponse != null)
-                    ? baseResponse.message : $"Product Sync(): Error connecting to server");
+                Helpers.runOnUiThread(() => { 
+                    MessageBox.Show((baseResponse != null)
+                        ? baseResponse.message : $"Error connecting to synchronizing products. Check your internet");
+
+                    MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_FAILED, null));
+                });
 
                 return null;
             }
 
-            List<Product> shopProducts =
+            List<Product> products =
                 JsonConvert.DeserializeObject<List<Product>>(baseResponse.data.ToString());
 
-            return shopProducts;
+            return products;
         }
-
-        #region downloadImage [Not Used]
-        public async Task<string> downloadImage(string imgUrl, Func<int, int> action = null)
-        {
-            Uri uri = new Uri(imgUrl);
-
-            string filename = System.IO.Path.GetFileName(uri.LocalPath);
-
-            var random = new Random().Next(10000, 99999);
-            string filepath = imagesFolder + (KStrings.DEV ? $"{random}-{filename}" : filename);
-
-            if (File.Exists(filepath))
-            {
-                Helpers.log($"Image ({filename}) File already exists");
-                return filepath;
-                //File.Delete(filepath);
-                //filepath = imagesFolder + $"{new Random().Next(10000, 99999)}-{filename}";
-            }
-
-            using (var client = new HttpClient())
-            {
-                await client.DownloadFileTaskAsync(uri, filepath);
-            }
-
-            return filepath;
-        }
-        #endregion
-
-        #region DownloadAsync
-        //public static async Task DownloadAsync(Uri requestUri, string filename)
-        //{
-        //    if (filename == null)
-        //        throw new ArgumentNullException("filename");
-
-        //    if (Proxy != null)
-        //        WebRequest.DefaultWebProxy = Proxy;
-
-        //    using (var httpClient = new HttpClient())
-        //    {
-        //        using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-        //        {
-        //            using (Stream contentStream = await (await httpClient.SendAsync(request)).Content.ReadAsStreamAsync(), stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None, Constants.LargeBufferSize, true))
-        //            {
-        //                await contentStream.CopyToAsync(stream);
-        //            }
-        //        }
-        //    }
-        //}
-        #endregion
 
         public string downloadProductImage(string imgUrl, Func<int, int> action = null)
         {

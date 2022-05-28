@@ -5,9 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShopUrban.View.Dialogs"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:conv="clr-namespace:ShopUrban.Converters"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
-        Title="Edit Product" Height="500" Width="600">
+        Title="Edit Product" MinHeight="600" Height="Auto" Width="600">
+
+    <Window.Resources>
+        <conv:DateTimeConverter x:Key="dateTimeConverter" />
+    </Window.Resources>
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="15">
@@ -29,11 +34,18 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="" Name="tbStockCountToUpdate" 
+                            <TextBox Grid.Column="0" Name="tbStockCountToUpdate" 
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                      materialDesign:HintAssist.Hint="Add/Remove Stock" materialDesign:HintAssist.IsFloating="True" 
                                      KeyUp="tbStockCountToUpdate_KeyUp" Margin="0 0 10 0"
-                                     />
+                                     GotFocus="tb_input_GotFocus" LostFocus="tb_input_LostFocus"
+                                     >
+                                <Binding Path="stockCount" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <local:StockUpdateValidationRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox>
                             <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 0 0">
                                 <TextBlock Text="Stock Action" Margin="0 0 0 5" />
                                 <Grid>
@@ -41,9 +53,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox x:Name="cbIncrease" Content="Increase" IsChecked="True" 
+                                    <CheckBox x:Name="cbIncrease" Content="Stock-In" IsChecked="True" 
                                           HorizontalAlignment="Left" Click="cbIncrease_Click" />
-                                    <CheckBox x:Name="cbDecrease" Content="Decrease" IsChecked="false" 
+                                    <CheckBox x:Name="cbDecrease" Content="Deduct" IsChecked="false" 
                                           HorizontalAlignment="Right" Click="cbDecrease_Click" Grid.Column="1" />
                                 </Grid>
                             </StackPanel>
@@ -71,22 +83,25 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding shopProduct.sell_price}" 
-                                     Name="tbSellPrice" Margin="0 0 10 0"
-                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                     materialDesign:HintAssist.Hint="Sell Price" materialDesign:HintAssist.IsFloating="True" 
-                                     />
-                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding shopProduct.cost_price}" 
-                                     Name="tbCostPrice" Margin="10 0 0 0"
+                            <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding shopProduct.cost_price}" 
+                                     Name="tbCostPrice" Margin="0 0 10 0"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                      materialDesign:HintAssist.Hint="Cost Price" 
                                      materialDesign:HintAssist.IsFloating="True" 
+                                     GotFocus="tb_input_GotFocus" LostFocus="tb_input_LostFocus"
+                                     />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding shopProduct.sell_price}" 
+                                     Name="tbSellPrice" Margin="10 0 0 0"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Sell Price" materialDesign:HintAssist.IsFloating="True" 
+                                     GotFocus="tb_input_GotFocus" LostFocus="tb_input_LostFocus"
                                      />
                             <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding shopProduct.restock_alert}" 
                                      Name="tbRestockAlert" Margin="0 15 10 0"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                      materialDesign:HintAssist.Hint="Restock Alert" materialDesign:HintAssist.IsFloating="True"
                                      materialDesign:HintAssist.HelperText="The stock level at which you will be notified to restock" 
+                                     GotFocus="tb_input_GotFocus" LostFocus="tb_input_LostFocus"
                                      />
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding shopProduct.expired_date}" 
                                      Name="tbExpiredDate" Margin="10 15 0 0"

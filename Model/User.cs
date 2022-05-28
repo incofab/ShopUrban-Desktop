@@ -21,13 +21,14 @@ namespace ShopUrban.Model
         public string othername { get; set; }
         public string surname { get; set; }
         public string username { get; set; }
+        public string name { get { return surname + " " + firstname; } }
         public string email { get; set; }
         public string contact_no { get; set; }
         public string gender { get; set; }
 
         public override string ToString()
         {
-            Trace.WriteLine(
+            return (
                 "id = " + id
                 + "firstname = " + firstname
                 + ", surname = " + surname
@@ -36,9 +37,7 @@ namespace ShopUrban.Model
                 + ", email = " + email
                 + ", contact_no = " + contact_no
                 + ", gender = " + gender
-                );
-
-            return base.ToString();
+            );
         }
 
     }

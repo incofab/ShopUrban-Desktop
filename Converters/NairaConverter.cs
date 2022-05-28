@@ -20,10 +20,8 @@ namespace ShopUrban.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            //Console.WriteLine("Parameter = " + prepareExamWindow.selectedCourse.ToString());
-
-            //return value + " (" + getNumOfQuestions(prepareExamWindow.selectedCourse.course_name, value.ToString()) + " Questions)";
-            double.TryParse(value.ToString(), out double amount);
+            //Helpers.log("NairaConverter Value = " + value);
+            decimal.TryParse(value.ToString(), out decimal amount);
 
             return KStrings.NAIRA_SIGN + Helpers.numberFormat(amount);
         }

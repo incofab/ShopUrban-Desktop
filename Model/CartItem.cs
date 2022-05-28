@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Newtonsoft.Json;
 using ShopUrban.Util;
 using System;
 using System.Collections.Generic;
@@ -32,16 +33,16 @@ namespace ShopUrban.Model
         public int id { get; set; }
         public int cart_id { get; set; }
         public int shop_product_id { get; set; }
-        private double _price { get; set; }
-        public double price { get { return _price; } 
+        private decimal _price { get; set; }
+        public decimal price { get { return _price; } 
             set {
                 _price = value;
                 //cost_price = _quantity * _price;
                 NotifyPropertyChanged("price"); 
             } 
         }
-        public double discount { get; set; }
-        public double cost_price { get; set; }
+        public decimal discount { get; set; }
+        public decimal cost_price { get; set; }
         private int _quantity { get; set; }
         public int quantity { 
             get { return _quantity; } 
@@ -60,45 +61,45 @@ namespace ShopUrban.Model
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public string priceNaira { get { return Helpers.naira(price); } }
-        public double totalPrice { get { return quantity * price; } }
+        public decimal totalPrice { get { return quantity * price; } }
         public string totalPriceNaira { get { return Helpers.naira(totalPrice); } }
+
+        [JsonProperty(propertyName: "shop_product")]
         public ShopProduct shopProduct { get; set; }
 
         public static void save(CartItem cartItem)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, cartItem, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, cartItem);
-            }
+            var insertSql = prepareInsertQuery(table, cartItem, fillable);
+
+            cnn.Execute(insertSql, cartItem);
         }
 
         public static void multiCreate(List<CartItem> cartItems, int? cartId = null)
         {
             if (cartItems == null) return;
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            var cnn = DBCreator.getConn();
+
+            foreach (var cartItem in cartItems)
             {
-                foreach (var cartItem in cartItems)
-                {
-                    if (cartId != null) cartItem.cart_id = (int)cartId;
+                if (cartId != null) cartItem.cart_id = (int)cartId;
 
-                    var insertSql = prepareInsertQuery("cart_items", cartItem, fillable);
+                var insertSql = prepareInsertQuery("cart_items", cartItem, fillable);
 
-                    cnn.Execute(insertSql, cartItem);
+                cnn.Execute(insertSql, cartItem);
 
-                    if (cartItem.shopProduct == null) continue;
+                if (cartItem.shopProduct == null) continue;
 
-                    //Update the shop product, for stock_count
-                    cartItem.shopProduct.stock_count -= cartItem.quantity;
+                //Update the shop product, for stock_count
+                cartItem.shopProduct.stock_count -= cartItem.quantity;
 
-                    var updateSql = prepareUpdateQuery(ShopProduct.table, 
-                        cartItem.shopProduct, new { id = cartItem.shopProduct.id }, 
-                        ShopProduct.fillable);
+                var updateSql = prepareUpdateQuery(ShopProduct.table, 
+                    cartItem.shopProduct, new { id = cartItem.shopProduct.id }, 
+                    ShopProduct.fillable);
 
-                    cnn.Execute(updateSql, cartItem.shopProduct);
-                }
+                cnn.Execute(updateSql, cartItem.shopProduct);
             }
         }
 

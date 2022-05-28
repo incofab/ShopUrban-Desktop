@@ -30,14 +30,14 @@ namespace ShopUrban.View.UserControls.Settings
         {
             var layout = Setting.getValue(Setting.KEY_RECEIPT_LAYOUT);
 
-            if (layout == null) layout = Setting.RECEIPT_LAYOUT_88MM;
+            if (layout == null) layout = Setting.RECEIPT_LAYOUT_80MM;
 
             cb58mm.IsChecked = false;
-            cb88mm.IsChecked = false;
+            cb80mm.IsChecked = false;
             cbA4.IsChecked = false;
 
             if (Setting.RECEIPT_LAYOUT_58MM.Equals(layout)) cb58mm.IsChecked = true;
-            if (Setting.RECEIPT_LAYOUT_88MM.Equals(layout)) cb88mm.IsChecked = true;
+            if (Setting.RECEIPT_LAYOUT_80MM.Equals(layout)) cb80mm.IsChecked = true;
             if (Setting.RECEIPT_LAYOUT_A4.Equals(layout)) cbA4.IsChecked = true;
         }
 
@@ -58,9 +58,9 @@ namespace ShopUrban.View.UserControls.Settings
             saveLayout(Setting.RECEIPT_LAYOUT_A4);
         }
 
-        private void cb88mm_Click(object sender, RoutedEventArgs e)
+        private void cb80mm_Click(object sender, RoutedEventArgs e)
         {
-            saveLayout(Setting.RECEIPT_LAYOUT_88MM);
+            saveLayout(Setting.RECEIPT_LAYOUT_80MM);
         }
 
         private void cb58mm_Click(object sender, RoutedEventArgs e)

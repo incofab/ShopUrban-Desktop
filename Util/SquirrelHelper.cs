@@ -18,15 +18,23 @@ namespace ShopUrban.Util
 {
     public class SquirrelHelper
     {
-        const string UPDATE_URL = @"C:\Users\User\Desktop\Project Files\Ogaboss\release";
+        const string UPDATE_URL = "https://github.com/incofab/shopurban-desktop-squirrel-update";
+        //const string UPDATE_URL = "https://github.com/incofab/ShopUrban-Desktop";
+            //@"C:\Users\User\Desktop\Project Files\Ogaboss\release";
 
         private static SquirrelHelper instance;
         private UpdateManager manager;
 
         public SquirrelHelper()
         {
-            manager = new UpdateManager(UPDATE_URL);
+            //manager = new UpdateManager(UPDATE_URL);
+            //initManager();
         }
+
+        //private async void initManager()
+        //{
+        //    manager = await UpdateManager.GitHubUpdateManager(UPDATE_URL);
+        //}
 
         public static SquirrelHelper getInstance()
         {
@@ -37,16 +45,36 @@ namespace ShopUrban.Util
 
         public async Task<bool> checkForUpdate()
         {
+            if (manager == null)
+            {
+                manager = await UpdateManager.GitHubUpdateManager(UPDATE_URL);
+            }
+
             var updateInfo = await manager.CheckForUpdate();
 
             return updateInfo.ReleasesToApply.Count > 0;
         }
 
-        public async void update()
+        public async Task<ReleaseEntry> update()
         {
-            await manager.UpdateApp();
+            if (manager == null)
+            {
+                manager = await UpdateManager.GitHubUpdateManager(UPDATE_URL);
+            }
+
+            ReleaseEntry releaseEntry = await manager.UpdateApp();
+
+            return releaseEntry;
         }
 
+        public void dispose()
+        {
+            if(manager != null)
+            {
+                manager.Dispose();
+                manager = null;
+            }
+        }
 
         
 

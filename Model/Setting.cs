@@ -34,11 +34,17 @@ namespace ShopUrban.Model
         public const string KEY_ORDER_LAST_SYNC_ID = "order_last_sync_id";
         public const string KEY_ORDER_LAST_SYNC_TIME = "order_last_sync_time";
         public const string KEY_RECEIPT_LAYOUT = "receipt_layout";
+        public const string KEY_STICKER_LAYOUT = "sticker_layout";
         public const string KEY_VAT_PERCENT = "vat";
+        public const string KEY_RECEIPT_BOTTOM_NOTE = "receipt_note";
+        public const string KEY_DESKTOP_INDEX_LAST_SYNC = "desktop_index_last_sync";
 
-        public const string RECEIPT_LAYOUT_88MM = "Receipt Layout 88mm";
+        public const string RECEIPT_LAYOUT_80MM = "Receipt Layout 80mm";
         public const string RECEIPT_LAYOUT_58MM = "Receipt Layout 58mm";
         public const string RECEIPT_LAYOUT_A4 = "Receipt Layout A4";
+
+        public const string STICKER_PRINT_LAYOUT_LANDSCAPE = "Landscape";
+        public const string STICKER_PRINT_LAYOUT_PORTRAIT = "Portrait";
 
         const string table = "settings";
         public int id { get; set; }
@@ -51,62 +57,69 @@ namespace ShopUrban.Model
 
         public static void create(object setting)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            var cnn = DBCreator.getConn();
+
+            var insertSql = prepareInsertQuery(table, setting, fillable);
+
+            cnn.Execute(insertSql, setting);
+        }
+
+        public static void multiCreateOrUpdate(List<Setting> settingList)
+        {
+            if (settingList == null) return;
+
+            foreach (var setting in settingList)
+            {
+                createOrUpdate(setting);
+            }
+        }
+
+        public static void createOrUpdate(Setting setting)
+        {
+            DateTime.Now.ToString(KStrings.TIME_FORMAT);
+
+            var cnn = DBCreator.getConn();
+
+            object queryObject = new { key = setting.key };
+
+            var query = cnn.Query<Setting>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}", 
+                queryObject).ToList();
+
+            if(query.Count() < 1) //Create new
             {
                 var insertSql = prepareInsertQuery(table, setting, fillable);
 
                 cnn.Execute(insertSql, setting);
             }
-        }
-        public static void createOrUpdate(Setting setting)
-        {
-            DateTime.Now.ToString(KStrings.TIME_FORMAT);
-
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            else //Update
             {
-                object queryObject = new { key = setting.key };
-
-                var query = cnn.Query<Setting>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}", 
-                    queryObject).ToList();
-
-                if(query.Count() < 1) //Create new
-                {
-                    var insertSql = prepareInsertQuery(table, setting, fillable);
-
-                    cnn.Execute(insertSql, setting);
-                }
-                else //Update
-                {
-                    var insertSql = prepareUpdateQuery(table, setting, new { key = setting.key}, fillable);
-                    cnn.Execute(insertSql, setting);
-                    //Reset the shop object
-                    if (setting.key == KEY_SHOP_DETAILS) shop = null;
-                }
+                var insertSql = prepareUpdateQuery(table, setting, new { key = setting.key}, fillable);
+                cnn.Execute(insertSql, setting);
+                //Reset the shop object
+                if (setting.key == KEY_SHOP_DETAILS) shop = null;
             }
         }
 
         public static void update(object setting, string key)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var updateSql = prepareUpdateQuery(table, setting, new { key = key }, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(updateSql, setting);
-            }
+            var updateSql = prepareUpdateQuery(table, setting, new { key = key }, fillable);
+
+            cnn.Execute(updateSql, setting);
         }
 
         public static Setting get(string key)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                object queryObject = new { key = key };
+            var cnn = DBCreator.getConn();
 
-                var whereQuery = prepareEqQuery(queryObject);
+            object queryObject = new { key = key };
 
-                var query = cnn.Query<Setting>($"SELECT * FROM {table} {whereQuery}", queryObject).ToList();
+            var whereQuery = prepareEqQuery(queryObject);
 
-                return (query == null || query.Count < 1) ? null : query.First();
-            }
+            var query = cnn.Query<Setting>($"SELECT * FROM {table} {whereQuery}", queryObject).ToList();
+
+            return (query == null || query.Count < 1) ? null : query.First();
         }
 
         public static string getValue(string key)
@@ -129,9 +142,11 @@ namespace ShopUrban.Model
 
             return shop;
         }
+
         public static string getShopId()
         {
             var shop = getShopDetail();
+
             return shop == null ? null : shop.id + "";
         }
 

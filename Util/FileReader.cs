@@ -97,7 +97,7 @@ namespace ShopUrban.Util
             //if (stream == null)
             if (!File.Exists(@path))
             {
-                Console.WriteLine("File not found; Path = " + path);
+                Helpers.log("File not found; Path = " + path, true);
                 return null;
             }
 

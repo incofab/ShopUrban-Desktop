@@ -27,7 +27,7 @@ namespace ShopUrban.View.UserControls
     public partial class ProductSyncCtrl : UserControl
     {
         private MainWindow mainWindow;
-        private ProductImagesDownloader ProductImagesDownloader;
+        //private ProductImagesDownloader ProductImagesDownloader;
 
         public ProductSyncCtrl(MainWindow mainWindow)
         {
@@ -39,8 +39,7 @@ namespace ShopUrban.View.UserControls
             handleViews();
             this.mainWindow = mainWindow;
 
-            ProductImagesDownloader = new ProductImagesDownloader(downloadImages_progress, downloadImages_completed);
-
+            //ProductImagesDownloader = new ProductImagesDownloader(downloadImages_progress, downloadImages_completed);
         }
 
         private void handleViews()
@@ -49,14 +48,10 @@ namespace ShopUrban.View.UserControls
             var imagesSynced = Setting.getValue(Setting.KEY_IMAGES_SYNCED);
 
             tbSyncText.Text = "Records Empty, Synchronize Now";
-            //imagesLoadingBox.Visibility = Visibility.Collapsed;
 
-            //If products are downloaded but images not synced yet.
             if (productLastSync != null)
             {
                 tbSyncText.Text = "Last Sync: " + productLastSync;
-
-                if (imagesSynced != "true") imagesLoadingBox.Visibility = Visibility.Visible;
             }
         }
 
@@ -66,41 +61,37 @@ namespace ShopUrban.View.UserControls
 
             if(unUploadedOrders.Count > 0)
             {
-                MessageBox.Show("Recent orders have to be uplaoaded first before syncing the products");
+                Toast.showError("Recent orders have to be uplaoaded first before syncing the products");
                 return;
             }
 
             syncProducts();
         }
 
-        private async void syncProducts()
+        private void syncProducts()
         {
             setIsProductSyncing(true);
 
-            List<Product> products = await ProductSyncHelper.syncProducts();
+            var obj = new SynchronizeShopProduct(
+                (List<ShopProduct> shopProducts) => {
 
-            MessageBox.Show((string)(products == null ? "Nothing" : products.Count + " products downloaded"));
+                    Toast.showInformation(shopProducts == null ? "Nothing" : shopProducts.Count + " shop products downloaded");
 
-            setIsProductSyncing(false);
+                    setIsProductSyncing(false);
+                    setIsImageSyncing(true);
 
-            handleViews();
+                    handleViews();
+                },
+                downloadImages_progress, 
+                () => {
 
-            // After syncing products, Start syncing images
+                    Setting.createOrUpdate(new Setting{key = Setting.KEY_IMAGES_SYNCED, value = "true"});
 
-            downloadImages();
-        }
+                    setIsImageSyncing(false);
+                }
+            );
 
-        private void downloadImages()
-        {
-            List<ProductUnit> productUnits = ProductUnit.all(
-                " Where photo IS NOT NULL AND local_photo IS NULL ");
-
-            if (productUnits == null) return;
-
-            setIsImageSyncing(true);
-
-            //worker.RunWorkerAsync(productUnits);
-            ProductImagesDownloader.beginDownloadProcess(productUnits);
+            obj.syncProductsAndImages();
         }
 
         private void downloadImages_progress(object sender, ProgressChangedEventArgs e)
@@ -110,26 +101,6 @@ namespace ShopUrban.View.UserControls
             imageProgress.Value = e.ProgressPercentage/len * 100;
 
             tbProgress.Text = $"{e.ProgressPercentage}/{len}";
-        }
-        private void downloadImages_completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Setting.createOrUpdate(new Setting
-            {
-                key = Setting.KEY_IMAGES_SYNCED,
-                value = "true"
-            });
-
-            setIsImageSyncing(false);
-
-            TimerHelper.SetTimeout(1000, () =>
-            {
-                Application.Current.Dispatcher.Invoke((Action)delegate ()
-                {
-                    //mainWindow.handleDisplay();
-                    MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_COMPLETED, null));
-
-                }, null);
-            });
         }
 
         private bool isSyncing;
@@ -156,6 +127,58 @@ namespace ShopUrban.View.UserControls
             //MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_COMPLETED, null));
             //downloadImages_completed(null, null);
         }
+
+        /*
+        private async void syncProductsDeprecated()
+        {
+            var lastSync = Setting.getValue(Setting.KEY_PRODUCT_LAST_SYNC_SERVER);
+
+            List<Product> products = await ProductSyncHelper.syncProducts(lastSync);
+
+            Toast.showInformation((string)(products == null ? "Nothing" : products.Count + " products downloaded"));
+
+            setIsProductSyncing(false);
+
+            handleViews();
+
+            // After syncing products, Start syncing images
+
+            downloadImages();
+        }
+
+        private void downloadImages()
+        {
+            List<ProductUnit> productUnits = ProductUnit.all(
+                " Where photo IS NOT NULL AND local_photo IS NULL ");
+
+            if (productUnits == null) return;
+
+            setIsImageSyncing(true);
+
+            //worker.RunWorkerAsync(productUnits);
+            ProductImagesDownloader.beginDownloadProcess(productUnits);
+        }
+        
+        private void downloadImages_completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Setting.createOrUpdate(new Setting
+            {
+                key = Setting.KEY_IMAGES_SYNCED,
+                value = "true"
+            });
+
+            setIsImageSyncing(false);
+
+            TimerHelper.SetTimeout(1000, () =>
+            {
+                Application.Current.Dispatcher.Invoke((Action)delegate ()
+                {
+                    MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_COMPLETED, null));
+
+                }, null);
+            });
+        }
+        */
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ShopUrban.Model;
 using ShopUrban.Util;
+using ShopUrban.Util.Printing.Paginator;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,7 @@ namespace ShopUrban.View.Receipt
     /// <summary>
     /// Interaction logic for Thermal88mm.xaml
     /// </summary>
-    public partial class Thermal88mm : Window
+    public partial class Thermal80mm : Window
     {
         public string dateTime { get; }
         public Staff staff { get; }
@@ -26,7 +27,7 @@ namespace ShopUrban.View.Receipt
         public Shop shop { get; }
         public List<CartItem> cartItems { get; }
 
-        public Thermal88mm(Order order)
+        public Thermal80mm(Order order, bool autoPrint )
         {
             InitializeComponent();
 
@@ -49,6 +50,21 @@ namespace ShopUrban.View.Receipt
             }
 
             DataContext = this;
+
+            tbBottomNote.Text = Setting.getValue(Setting.KEY_RECEIPT_BOTTOM_NOTE) ?? "Thanks for your Patronage";
+
+            var customerName = order.user?.name?.Trim();
+            if (!string.IsNullOrEmpty(customerName) || !string.IsNullOrEmpty(order.customer_name))
+            {
+                boxCustomer.Visibility = Visibility.Visible;
+                tbCustomer.Text = !string.IsNullOrEmpty(customerName) ? customerName : order.customer_name;
+            }
+            else boxCustomer.Visibility = Visibility.Collapsed;
+
+            if (order.shipping_cost < 1) boxDeliveryFee.Visibility = Visibility.Collapsed;
+            if (order.vat_amount < 1) boxVAT.Visibility = Visibility.Collapsed;
+
+            if(autoPrint) print();
         }
 
         private void print()
@@ -56,11 +72,12 @@ namespace ShopUrban.View.Receipt
             btnPrint.Visibility = Visibility.Collapsed;
 
             PrintDialog p = new PrintDialog();
-            p.PrintVisual(this, $"Order Receipt - {shop.name} - {dateTime}");
 
-            //TimerHelper.SetTimeout(1000, () => {
-            //    btnPrint.Visibility = Visibility.Visible;
-            //});
+            //if (p.ShowDialog() == true)
+            //{
+                p.PrintVisual(printArea, $"Order Receipt - {shop.name} - {dateTime}");
+            //}
+
             btnPrint.Visibility = Visibility.Visible;
         }
 

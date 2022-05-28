@@ -111,10 +111,11 @@ namespace ShopUrban.Model
         {
             Helpers.log(query);
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                cnn.Execute(query, obj);
-            }
+            var cnn = DBCreator.getConn();
+            //using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            //{
+            cnn.Execute(query, obj);
+            //}
         }
 
         public override string ToString()
@@ -132,6 +133,7 @@ namespace ShopUrban.Model
 
                 str += $"type||{name} = {type}||{propValue}, -- ";
             }
+
             return str;
         }
 

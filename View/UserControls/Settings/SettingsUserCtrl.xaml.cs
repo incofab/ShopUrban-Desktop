@@ -26,7 +26,15 @@ namespace ShopUrban.View.UserControls.Settings
             {
                 this.Background = Brushes.Transparent;
             }
-
         }
+
+        public void refresh()
+        {
+            bPaperLayoutSettingsCtrl.Child = new PaperLayoutSettingsCtrl();
+            //bVATSettingUserCtrl.Child = new VATSettingUserCtrl();
+            bStickerLayoutSettingsCtrl.Child = new StickerLayoutSettingsCtrl();
+            //bReceiptBottomNote.Child = new ReceiptBottomNote();
+        }
+
     }
 }

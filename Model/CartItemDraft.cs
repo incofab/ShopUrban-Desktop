@@ -45,28 +45,26 @@ namespace ShopUrban.Model
 
         public static void save(CartItemDraft cartItem)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, cartItem, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, cartItem);
-            }
+            var insertSql = prepareInsertQuery(table, cartItem, fillable);
+
+            cnn.Execute(insertSql, cartItem);
         }
 
         public static void multiCreate(List<CartItemDraft> cartItems, int? cartId = null)
         {
             if (cartItems == null) return;
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            var cnn = DBCreator.getConn();
+
+            foreach (var cartItem in cartItems)
             {
-                foreach (var cartItem in cartItems)
-                {
-                    if (cartId != null) cartItem.cart_id = (int)cartId;
+                if (cartId != null) cartItem.cart_id = (int)cartId;
 
-                    var insertSql = prepareInsertQuery(table, cartItem, fillable);
+                var insertSql = prepareInsertQuery(table, cartItem, fillable);
 
-                    cnn.Execute(insertSql, cartItem);
-                }
+                cnn.Execute(insertSql, cartItem);
             }
         }
 

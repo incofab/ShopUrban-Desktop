@@ -1,4 +1,5 @@
-﻿using ShopUrban.Util.Network;
+﻿using ShopUrban.Services;
+using ShopUrban.Util.Network;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -39,13 +40,18 @@ namespace ShopUrban.Util
             timerObj = null;
         }
 
-        private async void syncOrders()
+        private void syncOrders()
         {
-            BaseResponse baseResponse = await ProductDownloader.getInstance().uploadOrders(false);
-
-            if (baseResponse == null) return;
-
-            stop();
+            OrderHelper.uploadPendingOrders((BaseResponse baseResponse) => {
+                    if (baseResponse == null) return;
+                    stop();
+                },
+            false);
+            //Helpers.runOnUiThread(async () => { 
+            //    BaseResponse baseResponse = await ProductDownloader.getInstance().uploadOrders(false);
+            //    if (baseResponse == null) return;
+            //    stop();
+            //});
         }
     }
 

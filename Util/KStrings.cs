@@ -11,15 +11,16 @@ namespace ShopUrban.Util
     {
         public readonly static string BASE_FOLDER = Environment.GetFolderPath(
             Environment.SpecialFolder.CommonApplicationData) + $"/{APP_NAME}/";
-        // Local 77777779, 1234, 4399595348343
-        //Staging: En-En-1104, 0503, +2348032485925 ... Rotate and Shine En-Ti-1228
+        // Local +77777779, 1234, et or 4399595348343
+        //Staging: En-Ti-1228|En-En-1104, 0503, +2348032485925 ... Rotate and Shine En-Ti-1228
         //Production: En-En-1014|En-En-0107, 0102, +2348032485925
         private static BrushConverter converter = new BrushConverter();
         //var brush = (Brush)converter.ConvertFromString("#FFFFFF90");
         public const string APP_NAME = "ShopUrban";
         
         public const bool DEV = true;
-        public const int VERSION = 1;
+        public const int DB_VERSION = 4;
+        //public const int VERSION = 1;
         public const int APP_PRICE = 1500;
         public const string SITE_EMAIL = "support@shopurban.co";
         public const string WEBSITE = "https://shopurban.co";
@@ -32,15 +33,21 @@ namespace ShopUrban.Util
         public const string NAIRA_SIGN = "₦"; // ((char)8358).ToString();
         
         public const string URL_BASE = (DEV 
-            //? "https://testapi.shopurban.co/"
-            ? "http://192.168.56.1:8000/"
-            : "https://api.shopurban.co/");
-        public const string URL_BASE_API = URL_BASE+"api/desktop/";
+            //? "https://testapi.shopurban.co/api/"
+            ? "http://192.168.56.1:8000/api/"
+            : "https://api.shopurban.co/api/");
+        public const string URL_BASE_API = URL_BASE+"desktop/";
         public const string URL_LOGIN_API = URL_BASE_API + "shop/user/login";
+        public const string URL_DESKTOP_DASHBOARD_API = URL_BASE_API + "shop/dashboard";
         public const string URL_GET_PRODUCTS_API = URL_BASE_API + "shop/product/index";
+        public const string URL_GET_PRODUCTS_API_V2 = URL_BASE_API + "shop/product/all";
         public const string URL_UPLOAD_ORDERS_API = URL_BASE_API + "shop/order/upload";
         public const string URL_SHOP_PRODUCT_UPDATE = URL_BASE_API + "shop/product/update";
         public const string URL_SHOP_PRODUCT_STOCK_ACTION = URL_BASE_API + "shop/product/stock-action";
+        public const string URL_SHOW_ORDER = URL_BASE + "oga/order/show";
+        public const string URL_ORDER_ADD_PAYMENT = URL_BASE + "oga/order/update/amount";
+
+        public const string URL_SHOP_ORDERS_INDEX = URL_BASE + "oga/order/index";
 
         public const string URL_FEEDBACK_API = URL_BASE_API + "feedback/store";
         public const string URL_GET_ANNOUNCEMENT_API = URL_BASE_API + "announcements";

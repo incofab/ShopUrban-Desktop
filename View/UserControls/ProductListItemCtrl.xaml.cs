@@ -62,6 +62,15 @@ namespace ShopUrban.View.UserControls
                 Helpers.log($"Errorl displaying image {imgSrc}, Error: {e.Message}");
             }
             //imgProductImage.Source = new BitmapImage(new Uri(imgSrc));
+
+            if (shopProduct.productUnit == null || string.IsNullOrEmpty(shopProduct.productUnit.barcode))
+            {
+                btnPrintSticker.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                btnPrintSticker.Visibility = Visibility.Visible;
+            }
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -78,13 +87,15 @@ namespace ShopUrban.View.UserControls
         {
             if(shopProduct.stock_count < 1) {
                 Helpers.playErrorSound();
-                MessageBox.Show("Out of stock");
+                //MessageBox.Show("Out of stock");
+                Toast.showError($"Out of stock \nProduct: {shopProduct.name} ");
                 return;
             }
 
             if(shopProduct.sell_price < 1) {
                 Helpers.playErrorSound();
-                MessageBox.Show("Please, update product price");
+                Toast.showError($"Please, update price for {shopProduct.name}");
+                //MessageBox.Show("Please, update product price");
                 return;
             }
 
@@ -97,6 +108,30 @@ namespace ShopUrban.View.UserControls
 
             updateUI();
         }
+
+        private void btnMenu_Click(object sender, RoutedEventArgs e)
+        {
+            menuContainer.Visibility = menuContainer.Visibility == Visibility.Visible
+                ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void btnPrintSticker_Click(object sender, RoutedEventArgs e)
+        {
+            if(shopProduct.productUnit == null || string.IsNullOrEmpty(shopProduct.productUnit.barcode))
+            {
+                Toast.showError("This product does not have a barcode");
+
+                return;
+            }
+
+            PrintDialog p = new PrintDialog();
+
+            if (p.ShowDialog() == true)
+            {
+                p.PrintVisual(new ProductBarcodeList(shopProduct), $"Product Barcodes");
+            }
+        }
+
     }
 }
 

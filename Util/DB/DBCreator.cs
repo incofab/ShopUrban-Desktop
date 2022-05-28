@@ -15,10 +15,11 @@ namespace ShopUrban.Util
     class DBCreator
     {
         public static string dbPath = KStrings.BASE_FOLDER + "DB";
-        public static string dbFilePath = dbPath + $"\\shopUrbanDb-v-{KStrings.VERSION}.db";
+        public static string dbFilePath = dbPath + $"\\shopUrbanDb-v-{KStrings.DB_VERSION}.db";
         public static string dbConnectionString = string.Format("Data Source={0};", dbFilePath);
 
         private static DBCreator instance;
+        private static SQLiteConnection sQLiteConnection;
 
         public static DBCreator getInstance()
         {
@@ -28,6 +29,16 @@ namespace ShopUrban.Util
             }
 
             return instance;
+        }
+
+        public static SQLiteConnection getConn()
+        {
+            if(sQLiteConnection == null)
+            {
+                sQLiteConnection = new SQLiteConnection(DBCreator.dbConnectionString);
+            }
+
+            return sQLiteConnection;
         }
 
         public void init()
@@ -68,9 +79,10 @@ namespace ShopUrban.Util
             //string strCon = string.Format("Data Source={0};", dbConnectionString);
 
             string[] arr = { Staff.CREATE_TABLE, Cart.CREATE_TABLE, CartItem.CREATE_TABLE,
+                ProductCategory.CREATE_TABLE,
                 Order.CREATE_TABLE, Product.CREATE_TABLE, ProductUnit.CREATE_TABLE,
                 Setting.CREATE_TABLE, ShopProduct.CREATE_TABLE, CartDraft.CREATE_TABLE,
-                CartItemDraft.CREATE_TABLE, OrderPayment.CREATE_TABLE
+                CartItemDraft.CREATE_TABLE, OrderPayment.CREATE_TABLE, ShopCustomer.CREATE_TABLE
             };
 
             using (SQLiteConnection sqlite_conn = new SQLiteConnection(dbConnectionString))
@@ -86,7 +98,7 @@ namespace ShopUrban.Util
 
                     var res = SqliteCmd.ExecuteNonQuery();
 
-                    if(KStrings.DEV) Trace.WriteLine($"Executed = {sql}, Rows = {res}");
+                    Helpers.log($"Executed = {sql}, Rows = {res}");
                 }
 
                 sqlite_conn.Close();

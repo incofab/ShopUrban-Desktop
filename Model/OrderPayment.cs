@@ -30,37 +30,35 @@ namespace ShopUrban.Model
         public int id { get; set; }
         public int user_id { get; set; }
         public string order_number_track { get; set; }
-        public double amount { get; set; }
-        public double remaining_amount { get; set; }
+        public decimal amount { get; set; }
+        public decimal remaining_amount { get; set; }
         public string payment_type { get; set; }
-        public int is_confirmed { get; set; }
+        public int? is_confirmed { get; set; }
         public string created_at { get; set; }
         public string updated_at { get; set; }
         public Order order { get; set; }
 
         public static List<OrderPayment> all(string orderNumber, string orderBy = "ASC")
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                object queryObject = new { order_number_track = orderNumber };
+            var cnn = DBCreator.getConn();
 
-                var sql = $" SELECT * FROM {table} " +
-                $" WHERE order_number_track = @order_number_track ORDER BY id {orderBy}";
+            object queryObject = new { order_number_track = orderNumber };
 
-                var query = cnn.Query<OrderPayment>(sql, queryObject);
+            var sql = $" SELECT * FROM {table} " +
+            $" WHERE order_number_track = @order_number_track ORDER BY id {orderBy}";
 
-                return query.ToList<OrderPayment>();
-            }
+            var query = cnn.Query<OrderPayment>(sql, queryObject);
+
+            return query.ToList<OrderPayment>();
         }
 
         public static void create(OrderPayment orderPayment)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, orderPayment, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, orderPayment);
-            }
+            var insertSql = prepareInsertQuery(table, orderPayment, fillable);
+
+            cnn.Execute(insertSql, orderPayment);
         }
 
     }

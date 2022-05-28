@@ -14,7 +14,7 @@
             <Setter Property="BorderThickness" Value="0" />
         </Style>
     </UserControl.Resources>
-    <Grid Margin="10">
+    <Grid >
         <Border Width="140" BorderThickness="1" BorderBrush="#881739E8" CornerRadius="10 10 0 0"
                 Background="White">
             <Button Style="{StaticResource PlainButton}" Click="Button_Click"
@@ -46,12 +46,28 @@
                 -->
             </Button>
         </Border>
-        <Button x:Name="btnEditShopProduct" Style="{StaticResource plainButton}" Cursor="Hand"
-                VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#44000000"
-                Margin="0 0 5 5" Click="btnEditShopProduct_Click">
-            <materialDesign:PackIcon Kind="Edit" Foreground="{StaticResource PrimaryHueDarkBrush}" 
-                                     Height="25" Width="25" />
-        </Button>
+        <Border Margin="0 0 5 5" VerticalAlignment="Top" HorizontalAlignment="Right" >
+            <StackPanel Orientation="Vertical">
+                <Button x:Name="btnMenu" Style="{StaticResource plainButton}" Cursor="Hand" Margin="0 5 0 0"
+                        Click="btnMenu_Click" Background="#77000000" Foreground="White"
+                        HorizontalAlignment="Right"  >
+                    <materialDesign:PackIcon Kind="DotsVertical" Padding="10"
+                                             Height="20" Width="20" />
+                </Button>
+                <StackPanel x:Name="menuContainer" Orientation="Vertical" Background="#AA000000" Margin="0" Visibility="Collapsed">
+                    <Button Style="{StaticResource plainButton}" HorizontalAlignment="Stretch" Foreground="White"
+                            HorizontalContentAlignment="Left" Padding="5 5" Click="btnEditShopProduct_Click"
+                            FontWeight="Normal" FontSize="11" Cursor="Hand">
+                        Edit
+                    </Button>
+                    <Button x:Name="btnPrintSticker" Style="{StaticResource plainButton}" HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Left" Padding="5 5" Click="btnPrintSticker_Click" 
+                            Foreground="White" FontWeight="Normal" FontSize="11" Cursor="Hand">
+                        Print Sticker
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
 

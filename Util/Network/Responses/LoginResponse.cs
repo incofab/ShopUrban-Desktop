@@ -23,10 +23,10 @@ namespace ShopUrban.Util.Network.Responses
         
         public override string ToString()
         {
-            Trace.WriteLine(
+            Helpers.log(
                 "token = " + token +
                 "shop = " + shop +
-                ", User = " + user
+                ", User = " + user, true
                 );
 
             return base.ToString();

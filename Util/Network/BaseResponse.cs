@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ShopUrban.Model;
+using ShopUrban.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,7 +38,7 @@ namespace ShopUrban.Util.Network
         
         public override string ToString()
         {
-            Trace.WriteLine(
+            Helpers.log(
                 "ErrorCode = " + errorCode
                 //+ ", successful = " + successful
                 + ", isSuccessful = " + isSuccessful
@@ -51,28 +52,34 @@ namespace ShopUrban.Util.Network
         }
 
         public static async Task<BaseResponse> callEndpoint(string url,
-            List<KeyValuePair<string, string>> l)
+            List<KeyValuePair<string, string>> l, string method = "POST", Action<BaseResponse> onComplete = null)
         {
             string token = Helpers.getLoginToken();
-            var shopId = Setting.getShopId();
+            var shopId = Helpers.getCurrentShop()?.id+"";
+
+            if (l != null && !string.IsNullOrEmpty(shopId))
+            {
+                bool containsShopId = false;
+                foreach (var kvp in l)
+                {
+                    if ("shop_id".Equals(kvp.Key)) containsShopId = true;
+                }
+
+                if (!containsShopId) l.Add(new KeyValuePair<string, string>("shop_id", shopId));
+            }
 
             #region Log query params on DEV
             if (KStrings.DEV)
             {
-                Trace.WriteLine("Calling: " + url);
-                Trace.WriteLine("Token: " + token);
-                
+                Helpers.log("Calling: " + url);
+                Helpers.log($"shopId = {shopId}, Size = {l?.Count}, Token: " + token);
+
                 foreach (var item in l)
                 {
-                    Trace.WriteLine($"Param: {item.Key} = " + item.Value);
+                    Helpers.log($"Param: {item.Key} = " + item.Value);
                 }
             }
             #endregion
-
-            if(l != null && !string.IsNullOrEmpty(shopId))
-            {
-                l.Add(new KeyValuePair<string, string>("shop_id", shopId));
-            }
 
             using (var client = new HttpClient())
             {
@@ -83,25 +90,49 @@ namespace ShopUrban.Util.Network
                 }
 
                 string resultContent = null;
+                BaseResponse res = null;
                 try
                 {
                     var content = new FormUrlEncodedContent(l);
 
+                    HttpResponseMessage result;
                     //client.PostAsync
-                    var result = await client.PostAsync(url, content);
+                    if ("POST".Equals(method))
+                    {
+                        result = await client.PostAsync(url, content);
+                    }
+                    else if ("PUT".Equals(method))
+                    {
+                        result = await client.PutAsync(url, content);
+                    }
+                    else
+                    {
+                        var queryParams = new QueryStringBuilder(l).ToString();
+                        url = url + (string.IsNullOrEmpty(queryParams) ? "" : "?" + queryParams);
+                        
+                        result = await client.GetAsync(url);
+                    }
 
                     resultContent = await result.Content.ReadAsStringAsync();
                     
-                    Trace.WriteLine("resultContent ");
-                    Trace.WriteLine(resultContent);
+                    Helpers.log("resultContent ");
+                    Helpers.log(resultContent);
 
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<BaseResponse>(resultContent);
+                    res =  Newtonsoft.Json.JsonConvert.DeserializeObject<BaseResponse>(resultContent);
+
+                    if(res != null && !res.isSuccessful && "You are not logged in".Equals(res.message))
+                    {
+                        Helpers.runOnUiThread(() => { LoginHelper.logout(true); });
+                    }
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine(url+" | Error: " + e.Message);
+                    Helpers.log(url+" | Error: " + e.Message);
                 }
-                return null;
+
+                if(onComplete != null) Helpers.runOnUiThread(() => { onComplete(res); });
+
+                return res;
             }
         }
 

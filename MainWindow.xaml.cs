@@ -1,29 +1,21 @@
 ﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
 using ShopUrban.Model;
 using ShopUrban.Model.Others;
+using ShopUrban.Services;
 using ShopUrban.Util;
 using ShopUrban.Util.Network;
+using ShopUrban.Util.Network.Responses;
 using ShopUrban.View;
 using ShopUrban.View.Dialogs;
 using ShopUrban.View.UserControls;
-using ShopUrban.View.UserControls.Cart;
 using ShopUrban.View.UserControls.Draft;
 using ShopUrban.View.UserControls.Settings;
+using ShopUrban.View.UserControls.ToastCtrl;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ShopUrban
 {
@@ -32,8 +24,9 @@ namespace ShopUrban
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ProductListCtrl productListCtrl;
         public static Staff staffDetail;
+        public static Shop shopDetail;
+        private ProductListCtrl productListCtrl;
         public List<SideMenu> menuItems { get; set; }
         private Dictionary<string, UserControl> pages = new Dictionary<string, UserControl>();
 
@@ -42,14 +35,12 @@ namespace ShopUrban
             DateTime.Now.ToString(KStrings.TIME_FORMAT);
 
             staffDetail = staff;
+            shopDetail = Setting.getShopDetail();
 
             InitializeComponent();
 
             productListCtrl = new ProductListCtrl();
 
-            //menuItemFrame.Navigate(productListCtrl);
-            //borderProductList.Child = productListCtrl;
-            //borderCartSection.Child = new CartSectionCtrl();
             boxEmpty.Children.Add(new ProductSyncCtrl(this));
 
             handleDisplay();
@@ -58,22 +49,24 @@ namespace ShopUrban
             lbMenuItems.ItemsSource = menuItems;
 
             lbMenuItems.SelectedIndex = 0;
-            //lbMenuItems.SelectedItem = ((List<SideMenu>)lbMenuItems.ItemsSource)[0];
-            //lbMenuItems_SelectionChanged(lbMenuItems, null);
-
-            MyEventBus.subscribe(handleEvent);
 
             AutoSyncOrders.getInstance().start();
+            DashboardSyncHelper.syncDashboard();
 
             productListCtrl.tbSearch.Focus();
 
             this.Title = "ShopUrban - v"+Helpers.getVersionNo();
+
+            toastContainer.Child = new ToastPageCtrl();
+
+            MyEventBus.subscribe(handleEvent);
         }
 
         protected override void OnClosed(EventArgs e)
         {
             MyEventBus.unSubscribe(handleEvent);
             base.OnClosed(e);
+            DBCreator.getConn().Close();
         }
 
         private List<SideMenu> getMenuItems()
@@ -83,8 +76,8 @@ namespace ShopUrban
             l.Add(new SideMenu { index = 1, title = "Stock", icon = PackIconKind.CartOutline, view = productListCtrl });
             l.Add(new SideMenu { index = 2, title = "Orders", icon = PackIconKind.BasketOutline, view = null });
             l.Add(new SideMenu { index = 3, title = "Draft", icon = PackIconKind.BriefcaseOutline, view = null });
-            l.Add(new SideMenu { index = 4, title = "Settings", icon = PackIconKind.GearOutline, view = new SettingsUserCtrl() });
-            //l.Add(new SideMenu { index = 4, title = "Product Sync", icon = PackIconKind.Reload, view = new ProductSyncCtrl(this) });
+            l.Add(new SideMenu { index = 4, title = "Settings", icon = PackIconKind.GearOutline, view = null });
+            //l.Add(new SideMenu { index = 5, title = "Barcodes", icon = PackIconKind.Barcode, view = new ProductBarcodeList() });
 
             return l;
         }
@@ -151,6 +144,19 @@ namespace ShopUrban
 
             switch (sideMenu.title)
             {
+                case "Stock":
+                    TimerHelper.SetTimeout(1000, () => {
+
+                        Application.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            if (productListCtrl == null) return;
+
+                            productListCtrl.tbSearch.Focus();
+
+                        }));
+                    });
+                    break;
+
                 case "Orders":
                     if (view == null) view = new OrderHistory();
                     ((OrderHistory)view).refresh();
@@ -160,11 +166,49 @@ namespace ShopUrban
                     if (view == null) view = new DraftUserCtrl();
                     ((DraftUserCtrl)view).refresh();
                     break;
+
+                case "Settings":
+                    if (view == null) view = new SettingsUserCtrl();
+                    ((SettingsUserCtrl)view).refresh();
+                    break;
             }
 
             return view;
         }
 
+        private async void indexData()
+        {
+            //    string desktop_index_last_sync = Setting.getValue(Setting.KEY_DESKTOP_INDEX_LAST_SYNC);
 
+            //    List<KeyValuePair<string, string>> l = new List<KeyValuePair<string, string>>();
+
+            //    //l.Add(new KeyValuePair<string, string>("shop_id", shopId));
+            //    l.Add(new KeyValuePair<string, string>("desktop_index_last_sync", desktop_index_last_sync));
+
+            //    BaseResponse baseResponse = await BaseResponse.callEndpoint(KStrings.URL_DESKTOP_DASHBOARD_API, l);
+
+            //    if (baseResponse == null || baseResponse.status != "success")
+            //    {
+            //        Helpers.log((baseResponse != null) ? baseResponse.message : $"Login(): Error connecting to server");
+            //        return;
+            //    }
+
+            //    DashboardIndexResponse dashboardIndexResponse =
+            //        JsonConvert.DeserializeObject<DashboardIndexResponse>(baseResponse.data.ToString());
+
+            //    ShopCustomer.multiCreateOrUpdate(dashboardIndexResponse.shop_customers);
+            //    Setting.multiCreateOrUpdate(dashboardIndexResponse.shop_settings);
+
+            //    DateTime.Now.ToString(KStrings.TIME_FORMAT);
+            //    desktop_index_last_sync = DateTime.Now.ToString(KStrings.TIME_FORMAT);
+
+            //    Setting.createOrUpdate(new Setting()
+            //    {
+            //        key = Setting.KEY_DESKTOP_INDEX_LAST_SYNC,
+            //        value = desktop_index_last_sync,
+            //    });
+
+            //    Helpers.log("Desktop index completed");
+        }
     }
 }

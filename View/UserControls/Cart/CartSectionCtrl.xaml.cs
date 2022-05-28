@@ -116,8 +116,8 @@ namespace ShopUrban.View.UserControls.Cart
 
         public void updateCartTotalPrice()
         {
-            double total = 0;
-            double totalQuantity = 0;
+            decimal total = 0;
+            decimal totalQuantity = 0;
             foreach (var cartItemCtrl in cartItemCtrls)
             {
                 total += cartItemCtrl.Value.cartItem.totalPrice;

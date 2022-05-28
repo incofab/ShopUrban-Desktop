@@ -15,6 +15,7 @@ namespace ShopUrban.Model
         public const string CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `products` (" +
             "id INTEGER NOT NULL," +
             "brand_id INTEGER," +
+            "product_category_id INTEGER," +
             "name VARCHAR(255)," +
             "barcode VARCHAR(255)," +
             "slug VARCHAR(255)," +
@@ -24,11 +25,14 @@ namespace ShopUrban.Model
 
         public const string table = "products";
 
-        public static string[] fillable = {"id", "name", "slug", "brand_id", "photo", "barcode", "created_at", "updated_at" };
+        public static string[] fillable = {
+            "id", "name", "slug", "brand_id", "photo", "barcode", "product_category_id", "created_at", "updated_at" 
+        };
         public int id { get; set; }
         public string name { get; set; }
         public string slug { get; set; }
-        public int brand_id { get; set; }
+        public int? brand_id { get; set; }
+        public int? product_category_id { get; set; }
         public string barcode { get; set; }
         public string photo { get; set; }
         public string created_at { get; set; }
@@ -39,6 +43,9 @@ namespace ShopUrban.Model
         [JsonProperty("shop_products")]
         public List<ShopProduct> shopProducts { get; set; }
 
+        [JsonProperty("product_category")]
+        public ProductCategory productCategory { get; set; }
+
         public static void create(Product product)
         {
             var insertSql = prepareInsertQuery(table, product, fillable);
@@ -48,31 +55,32 @@ namespace ShopUrban.Model
 
         public static void createOrUpdate(Product product)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            if (product == null) return;
+
+            var cnn = DBCreator.getConn();
+
+            object queryObject = new { id = product.id };
+
+            var query = cnn.Query<Product>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
+                queryObject).ToList();
+
+            if (query.Count() < 1) //Create new
             {
-                object queryObject = new { id = product.id };
+                var insertSql = prepareInsertQuery(table, product, fillable);
 
-                var query = cnn.Query<Product>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
-                    queryObject).ToList();
-
-                if (query.Count() < 1) //Create new
-                {
-                    var insertSql = prepareInsertQuery(table, product, fillable);
-
-                    cnn.Execute(insertSql, product);
-                }
-                else //Update
-                {
-                    //var first = query.First<Product>();
-                    var insertSql = prepareUpdateQuery(table, product, new { id = product.id }, fillable);
-                    cnn.Execute(insertSql, product);
-                }
+                cnn.Execute(insertSql, product);
+            }
+            else //Update
+            {
+                //var first = query.First<Product>();
+                var insertSql = prepareUpdateQuery(table, product, new { id = product.id }, fillable);
+                cnn.Execute(insertSql, product);
             }
         }
 
         public override string ToString()
         {
-            Helpers.log(
+            return (
                 "name = " + name
                 + ", slug = " + slug
                 + ", brand_id = " + brand_id
@@ -80,9 +88,7 @@ namespace ShopUrban.Model
                 + ", photo = " + photo
                 + ", created_at = " + created_at
                 + ", updated_at = " + updated_at
-                );
-
-            return base.ToString();
+            );
         }
 
     }

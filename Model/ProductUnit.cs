@@ -40,78 +40,81 @@ namespace ShopUrban.Model
         {
             if (productUnits == null) return;
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                foreach (var productUnit in productUnits)
-                {
-                    var insertSql = prepareInsertQuery(table, productUnit, fillable);
+            var cnn = DBCreator.getConn();
 
-                    cnn.Execute(insertSql, productUnit);
-                }
+            foreach (var productUnit in productUnits)
+            {
+                var insertSql = prepareInsertQuery(table, productUnit, fillable);
+
+                cnn.Execute(insertSql, productUnit);
             }
         }
+
         public static void multiCreateOrUpdate(List<ProductUnit> productUnits)
         {
-            if (productUnits == null) return;
+            if (productUnits == null || productUnits.Count == 0) return;
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            foreach (var productUnit in productUnits)
             {
-                foreach (var productUnit in productUnits)
-                {
-                    object queryObject = new { id = productUnit.id };
+                createOrUpdate(productUnit);
+            }
+        }
 
-                    var query = cnn.Query<ProductUnit>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
-                        queryObject).ToList();
+        public static void createOrUpdate(ProductUnit productUnit)
+        {
+            if (productUnit == null) return;
 
-                    if (query.Count() < 1) //Create new
-                    {
-                        var insertSql = prepareInsertQuery(table, productUnit, fillable);
+            var cnn = DBCreator.getConn();
 
-                        cnn.Execute(insertSql, productUnit);
-                    }
-                    else //Update
-                    {
-                        //var first = query.First<ProductUnit>();
-                        var insertSql = prepareUpdateQuery(table, productUnit, new { id = productUnit.id }, fillable);
-                        cnn.Execute(insertSql, productUnit);
-                    }
-                }
+            object queryObject = new { id = productUnit.id };
+
+            var query = cnn.Query<ProductUnit>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
+                queryObject).ToList();
+
+            if (query.Count() < 1) //Create new
+            {
+                var insertSql = prepareInsertQuery(table, productUnit, fillable);
+
+                cnn.Execute(insertSql, productUnit);
+            }
+            else //Update
+            {
+                //var first = query.First<ProductUnit>();
+                var insertSql = prepareUpdateQuery(table, productUnit, new { id = productUnit.id }, fillable);
+                cnn.Execute(insertSql, productUnit);
             }
         }
 
         public static List<ProductUnit> all(string condition = null)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var sql = $"SELECT * FROM product_units "+condition;
+            var cnn = DBCreator.getConn();
 
-                var query = cnn.Query<ProductUnit>(sql);
+            var sql = $"SELECT * FROM product_units "+condition;
 
-                return query.ToList();
-            }
+            var query = cnn.Query<ProductUnit>(sql);
+
+            return query.ToList();
         }
 
         public static List<ProductUnit> allUnsyncProductImages()
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var sql = $"SELECT * FROM product_units WHERE local_photo IS NULL";
+            var cnn = DBCreator.getConn();
 
-                var query = cnn.Query<ProductUnit>(sql);
+            var sql = $"SELECT * FROM product_units WHERE local_photo IS NULL";
 
-                return query.ToList();
-            }
+            var query = cnn.Query<ProductUnit>(sql);
+
+            return query.ToList();
         }
 
         public static void update(ProductUnit productUnit)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareUpdateQuery("product_units", 
-                    productUnit, new { id = productUnit.id });
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, productUnit);
-            }
+            var insertSql = prepareUpdateQuery("product_units", 
+                productUnit, new { id = productUnit.id });
+
+            cnn.Execute(insertSql, productUnit);
         }
 
         public static bool checkIfExist(IDbConnection cnn, int id)

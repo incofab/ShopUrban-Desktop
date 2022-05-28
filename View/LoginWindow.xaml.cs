@@ -44,22 +44,38 @@ namespace ShopUrban.View
         private void login_Click(object sender, RoutedEventArgs e)
         {
             if (isLoginLoading) return;
-            setLoginLoading(true);
 
             string phone = tbPhone.Text.Trim().Replace(" ", "");
-            string pin = pbPassword.Password.Trim();
+            string password = pbPassword.Password.Trim();
             string shopId = tbShopId.Text.Trim();
 
-            localLogin(phone, pin, shopId);
+            phone = Helpers.formatPhone(phone);
+
+            if (string.IsNullOrEmpty(shopId))
+            {
+                var shopDetail = Setting.getShopDetail();
+
+                if(shopDetail != null) shopId = shopDetail.shop_id;
+            }
+
+            if (string.IsNullOrEmpty(shopId))
+            {
+                MessageBox.Show("Shop Id is required");
+                return;
+            }
+
+            setLoginLoading(true);
+
+            localLogin(phone, password, shopId);
         }
 
-        private void localLogin(string phone, string pin, string shopId)
+        private void localLogin(string phone, string password, string shopId)
         {
-            Staff staff = Staff.login(phone, Helpers.md5(pin));
+            Staff staff = Staff.login(phone, Helpers.md5(password));
 
             if (staff == null)
             {
-                login(phone, pin, shopId);
+                login(phone, password, shopId);
                 return;
             }
             
@@ -72,16 +88,13 @@ namespace ShopUrban.View
         {
             DateTime.Now.ToString(KStrings.TIME_FORMAT);
 
-            if (cbRememberLogin.IsChecked == true)
+            Setting.createOrUpdate(new Setting
             {
-                Setting.createOrUpdate(new Setting
-                {
-                    key = Setting.KEY_REMEMBER_LOGIN,
-                    display_name = "Remeber Login",
-                    value = "true",
-                    type = "boolean"
-                });
-            }
+                key = Setting.KEY_REMEMBER_LOGIN,
+                display_name = "Remeber Login",
+                value = cbRememberLogin.IsChecked == true ? "true" : "",
+                type = "boolean"
+            });
 
             Setting.createOrUpdate(new Setting
             {
@@ -91,16 +104,18 @@ namespace ShopUrban.View
                 type = "integer"
             });
 
+            MainWindow.staffDetail = staff;
             new MainWindow(staff).Show();
             
             Close();
         }
 
-        public async void login(string phone, string pin, string shopId)
+        public async void login(string phone, string password, string shopId)
         {
             List<KeyValuePair<string, string>> l = new List<KeyValuePair<string, string>>();
             
-            l.Add(new KeyValuePair<string, string>("verification_code", pin));
+            //l.Add(new KeyValuePair<string, string>("verification_code", pin));
+            l.Add(new KeyValuePair<string, string>("password", password));
             l.Add(new KeyValuePair<string, string>("contact_no", phone));
             l.Add(new KeyValuePair<string, string>("shop_id", shopId));
             
@@ -119,34 +134,36 @@ namespace ShopUrban.View
 
             User user = loginResponse.user;
 
-            var pinMd5 = Helpers.md5(pin);
+            var passwordMd5 = Helpers.md5(password);
 
-            var staff = new Staff()
-            {
-                name = $"{user.firstname} {user.surname}",
-                user_id = user.id,
-                phone = user.contact_no,
-                username = user.contact_no,
-                pin = pinMd5,
-                password = pinMd5,
-                token = loginResponse.token,
-            };
+            var staff = Staff.eqQuery(new { user_id = user.id }) ?? new Staff();
 
-            if(Staff.eqQuery(new { user_id = staff.user_id }) != null)
+            staff.name = $"{user.firstname} {user.surname}";
+            staff.user_id = user.id;
+            staff.phone = user.contact_no;
+            staff.username = user.contact_no;
+            staff.pin = passwordMd5;
+            staff.password = passwordMd5;
+            staff.token = loginResponse.token;
+
+            if(staff.id > 0)
             {
                 Staff.updateByUserId(staff);
             }
             else
             {
-                Staff.save(staff);
+                staff = Staff.save(staff);
             }
             
-            Setting.create(new 
+            Setting.createOrUpdate(new Setting
             {
                 key = Setting.KEY_SHOP_DETAILS,
                 value = JsonConvert.SerializeObject(loginResponse.shop),
                 type = "string",
             });
+            
+            MainWindow.shopDetail = loginResponse.shop;
+            MainWindow.staffDetail = staff;
 
             MessageBox.Show("Login successful "+loginResponse.user.surname);
 

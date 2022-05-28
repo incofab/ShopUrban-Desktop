@@ -1,19 +1,9 @@
 ﻿using Newtonsoft.Json;
 using ShopUrban.Model;
+using ShopUrban.Services;
 using ShopUrban.Util;
 using ShopUrban.Util.Network;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ShopUrban.View.Dialogs
 {
@@ -105,23 +95,32 @@ namespace ShopUrban.View.Dialogs
             handleUpload();
         }
 
-        private async void handleUpload()
+        private void handleUpload()
         {
             if (isLoading) return;
 
             setLoading(true);
 
-            BaseResponse baseResponse = await ProductDownloader.getInstance().uploadOrders();
+            OrderHelper.uploadPendingOrders((BaseResponse baseResponse) => {
+                    
+                    setLoading(false);
+                    
+                    if (baseResponse == null) return;
 
-            setLoading(false);
+                    DialogResult = true;
 
-            if (baseResponse == null) return;
+                    Toast.showSuccess("Orders uploaded successfully");
 
-            DialogResult = true;
+                    updateUI();
+                },
+            false);
 
-            MessageBox.Show("Orders uploaded successfully");
-
-            updateUI();
+            //BaseResponse baseResponse = await ProductDownloader.getInstance().uploadOrders();
+            //setLoading(false);
+            //if (baseResponse == null) return;
+            //DialogResult = true;
+            //Toast.showSuccess("Orders uploaded successfully");
+            //updateUI();
         }
 
 

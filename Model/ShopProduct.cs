@@ -32,9 +32,9 @@ namespace ShopUrban.Model
         public int id { get; set; }
         public int? product_id { get; set; }
         public int? product_unit_id { get; set; }
-        public double cost_price { get; set; }
-        public double sell_price { get; set; }
-        public int stock_count { get; set; }
+        public decimal cost_price { get; set; }
+        public decimal sell_price { get; set; }
+        public int? stock_count { get; set; }
         public int restock_alert { get; set; }
         public string expired_date { get; set; }
         public string created_at { get; set; }
@@ -53,117 +53,134 @@ namespace ShopUrban.Model
         {
             if (shopProducts == null) return;
 
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            var cnn = DBCreator.getConn();
+
+            foreach (var shopProduct in shopProducts)
             {
-                foreach (var shopProduct in shopProducts)
+                var insertSql = prepareInsertQuery(table, shopProduct, fillable);
+
+                cnn.Execute(insertSql, shopProduct);
+            }
+        }
+
+        public static void multiCreateOrUpdate(List<ShopProduct> shopProducts)
+        {
+            if (shopProducts == null) return;
+
+            var cnn = DBCreator.getConn();
+
+            foreach (var shopProduct in shopProducts)
+            {
+                object queryObject = new { id = shopProduct.id };
+
+                var query = cnn.Query<ShopProduct>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
+                    queryObject).ToList();
+
+                if (query.Count() < 1) //Create new
                 {
                     var insertSql = prepareInsertQuery(table, shopProduct, fillable);
 
                     cnn.Execute(insertSql, shopProduct);
                 }
-            }
-        }
-        public static void multiCreateOrUpdate(List<ShopProduct> shopProducts)
-        {
-            if (shopProducts == null) return;
-
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                foreach (var shopProduct in shopProducts)
+                else //Update
                 {
-                    object queryObject = new { id = shopProduct.id };
-
-                    var query = cnn.Query<ShopProduct>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
-                        queryObject).ToList();
-
-                    if (query.Count() < 1) //Create new
-                    {
-                        var insertSql = prepareInsertQuery(table, shopProduct, fillable);
-
-                        cnn.Execute(insertSql, shopProduct);
-                    }
-                    else //Update
-                    {
-                        var first = query.First<ShopProduct>();
-                        var insertSql = prepareUpdateQuery(table, shopProduct, new { id = shopProduct.id }, fillable);
-                        cnn.Execute(insertSql, shopProduct);
-                    }
+                    var first = query.First<ShopProduct>();
+                    var insertSql = prepareUpdateQuery(table, shopProduct, new { id = shopProduct.id }, fillable);
+                    cnn.Execute(insertSql, shopProduct);
                 }
             }
         }
+        public static void createOrUpdate(ShopProduct shopProduct)
+        {
+            if (shopProduct == null) return;
+
+            var cnn = DBCreator.getConn();
+
+            object queryObject = new { id = shopProduct.id };
+
+            var query = cnn.Query<ShopProduct>($"SELECT * FROM {table} {prepareEqQuery(queryObject)}",
+                queryObject).ToList();
+
+            if (query.Count() < 1) //Create new
+            {
+                var insertSql = prepareInsertQuery(table, shopProduct, fillable);
+
+                cnn.Execute(insertSql, shopProduct);
+            }
+            else //Update
+            {
+                var first = query.First<ShopProduct>();
+                var insertSql = prepareUpdateQuery(table, shopProduct, new { id = shopProduct.id }, fillable);
+                cnn.Execute(insertSql, shopProduct);
+            }
+
+        }
+
         public static void update(int id, object shopProduct)
         {
             DateTime.Now.ToString(KStrings.TIME_FORMAT);
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var updateSql = prepareUpdateQuery(table, shopProduct, new { id = id }, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(updateSql, shopProduct);
+            var updateSql = prepareUpdateQuery(table, shopProduct, new { id = id }, fillable);
 
-                //MyEventBus.post(new EventMessage(EventMessage.EVENT_SHOP_PRODUCT_UPDATED, id));
-            }
+            cnn.Execute(updateSql, shopProduct);
         }
 
         public static List<ShopProduct> all(string searchName = null, string searchBarcode = null, 
-            int searchById = -1)
+            int searchById = -1, int productCategoryId = 0, string limit = " LIMIT 100 OFFSET 0 ")
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
+            IDbConnection cnn = DBCreator.getConn();
+
+            var sql = $"SELECT * FROM shop_products INNER JOIN products ON " +
+                $"shop_products.product_id = products.id " +
+                $"INNER JOIN product_units ON shop_products.product_unit_id = product_units.id ";
+
+            object queryObj = null;
+
+            var prefix = " WHERE ";
+            if (!string.IsNullOrEmpty(searchName))
             {
-                var sql = $"SELECT * FROM shop_products INNER JOIN products ON " +
-                    $"shop_products.product_id = products.id " +
-                    $"INNER JOIN product_units ON shop_products.product_unit_id = product_units.id ";
-
-                object queryObj = null;
-                if (!string.IsNullOrEmpty(searchName))
-                {
-                    sql += $" WHERE products.name LIKE @name OR product_units.name LIKE @name " +
-                        $" OR product_units.barcode = @barcode ";
-                    queryObj = new { name = $"%{searchName}%", barcode = searchName };
-                }
-
-                if(!string.IsNullOrEmpty(searchBarcode))
-                {
-                    sql += $" WHERE product_units.barcode = @barcode ";
-                    queryObj = new { barcode = searchBarcode };
-                }
-
-                if(searchById != -1)
-                {
-                    sql += $" WHERE shop_products.id = @id ";
-                    queryObj = new { id = searchById };
-                }
-                //Helpers.log("Shop Products, searchById = "+ searchById);
-                //Helpers.log(sql);
-                var query = cnn.Query<ShopProduct, Product, ProductUnit, ShopProduct>
-                    (sql, (shopProduct, product, productUnit) =>
-                {
-                    shopProduct.product = product;
-                    shopProduct.productUnit = productUnit;
-                    return shopProduct;
-
-                }, queryObj, splitOn: "id");
-
-                return query.ToList();
+                sql += $" WHERE products.name LIKE @name OR product_units.name LIKE @name " +
+                    $" OR product_units.barcode = @barcode ";
+                queryObj = new { name = $"%{searchName}%", barcode = searchName };
+                prefix = " AND ";
             }
+
+            if(!string.IsNullOrEmpty(searchBarcode))
+            {
+                sql += $" WHERE product_units.barcode = @barcode ";
+                queryObj = new { barcode = searchBarcode };
+                prefix = " AND ";
+            }
+
+            if(searchById != -1)
+            {
+                sql += $" WHERE shop_products.id = @id ";
+                queryObj = new { id = searchById };
+                prefix = " AND ";
+            }
+
+            if(productCategoryId != 0)
+            {
+                sql += $" {prefix} products.product_category_id = @product_category_id ";
+                queryObj = new { product_category_id = productCategoryId };
+            }
+
+            sql += limit;
+
+            var query = cnn.Query<ShopProduct, Product, ProductUnit, ShopProduct>
+                (sql, (shopProduct, product, productUnit) =>
+            {
+                shopProduct.product = product;
+                shopProduct.productUnit = productUnit;
+                return shopProduct;
+
+            }, queryObj, splitOn: "id");
+
+            var endQuery = DateTime.Now.Millisecond;
+
+            return query.ToList();
         }
-
-        //public static ShopProduct get(int id)
-        //{
-        //    using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-        //    {
-        //        object queryObject = new { id = id };
-
-        //        var whereQuery = prepareEqQuery(queryObject);
-
-        //        var sql = $"SELECT * FROM shop_products " +
-        //            $" INNER JOIN products ON shop_products.product_id = products.id " +
-        //            $" INNER JOIN product_units ON shop_products.product_unit_id = product_units.id ";
-
-        //        var query = cnn.Query<Setting>($"SELECT * FROM {table} {whereQuery}", queryObject).ToList();
-
-        //        return (query == null || query.Count < 1) ? null : query.First();
-        //    }
-        //}
 
         public static bool checkIfExist(IDbConnection cnn, int id)
         {

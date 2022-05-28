@@ -58,41 +58,48 @@ namespace ShopUrban.Util.Network
                 var i = 0;
                 foreach (var productUnit in productUnits)
                 {
-                    i++;
-
-                    if (string.IsNullOrEmpty(productUnit.photo))
+                    try
                     {
-                        worker.ReportProgress(i, productUnits);
-                        continue;
-                    }
+                        i++;
 
-                    Uri uri = new Uri(productUnit.photo);
-                    string filename = System.IO.Path.GetFileName(uri.LocalPath);
-
-                    string filepath = ImagesFolder + filename;
-
-                    if (File.Exists(filepath))
-                    {
-                        Helpers.log($"Image ({filename}) File already exists");
-
-                        if (!filepath.Equals(productUnit.local_photo))
+                        if (string.IsNullOrEmpty(productUnit.photo))
                         {
-                            productUnit.local_photo = filepath;
-                            ProductUnit.update(productUnit);
+                            worker.ReportProgress(i, productUnits);
+                            continue;
                         }
 
+                        Uri uri = new Uri(productUnit.photo);
+                        string filename = System.IO.Path.GetFileName(uri.LocalPath);
+
+                        string filepath = ImagesFolder + filename;
+
+                        if (File.Exists(filepath))
+                        {
+                            //Helpers.log($"Image ({filename}) File already exists");
+
+                            if (!filepath.Equals(productUnit.local_photo))
+                            {
+                                productUnit.local_photo = filepath;
+                                ProductUnit.update(productUnit);
+                            }
+
+                            worker.ReportProgress(i, productUnits);
+                            continue;
+                        }
+
+                        //var filePath = productDownloader.downloadProductImage(productUnit.photo);
+                        //var filePath = await productDownloader.downloadImage(productUnit.photo);
+                        client.DownloadFile(uri, filepath);
+
+                        productUnit.local_photo = filepath;
+                        ProductUnit.update(productUnit);
+
                         worker.ReportProgress(i, productUnits);
-                        continue;
                     }
-
-                    //var filePath = productDownloader.downloadProductImage(productUnit.photo);
-                    //var filePath = await productDownloader.downloadImage(productUnit.photo);
-                    client.DownloadFile(uri, filepath);
-
-                    productUnit.local_photo = filepath;
-                    ProductUnit.update(productUnit);
-
-                    worker.ReportProgress(i, productUnits);
+                    catch (Exception e)
+                    {
+                        Helpers.log($"Error downloading image with URL = {productUnit.photo}, Error: {e.Message}", true);
+                    }
                 }
             }
         }

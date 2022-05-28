@@ -56,6 +56,9 @@
     <ApplicationIcon>logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BarcodeStandard, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BarcodeLib.2.4.0\lib\netstandard2.0\BarcodeStandard.dll</HintPath>
+    </Reference>
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.2.0.123\lib\net461\Dapper.dll</HintPath>
     </Reference>
@@ -73,6 +76,9 @@
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=4.3.0.3, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.4.3.0\lib\net452\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.dll</HintPath>
@@ -99,9 +105,38 @@
       <HintPath>..\packages\squirrel.windows.2.0.1\lib\Net45\Squirrel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.115.5, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.5.0.2\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.5.0.2\lib\net461\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -125,9 +160,11 @@
     <Compile Include="Commands\GenericCommand.cs" />
     <Compile Include="Converters\GenericConverter.cs" />
     <Compile Include="Converters\HintedTextboxConverter.cs" />
+    <Compile Include="Converters\DateTimeConverter.cs" />
     <Compile Include="Converters\NairaConverter.cs" />
     <Compile Include="Model\Address.cs" />
     <Compile Include="Model\BaseModel.cs" />
+    <Compile Include="Model\ProductCategory.cs" />
     <Compile Include="Model\Cart.cs" />
     <Compile Include="Model\CartDraft.cs" />
     <Compile Include="Model\CartItem.cs" />
@@ -140,22 +177,33 @@
     <Compile Include="Model\ProductUnit.cs" />
     <Compile Include="Model\Setting.cs" />
     <Compile Include="Model\Shop.cs" />
+    <Compile Include="Model\ShopCustomer.cs" />
     <Compile Include="Model\ShopProduct.cs" />
     <Compile Include="Model\Staff.cs" />
     <Compile Include="Model\State.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Services\LoginHelper.cs" />
+    <Compile Include="Services\DashboardSyncHelper.cs" />
+    <Compile Include="Services\OrderHelper.cs" />
+    <Compile Include="Services\SynchronizeShopProduct.cs" />
     <Compile Include="Services\ProductSyncHelper.cs" />
     <Compile Include="SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\SQLiteConcurrencyTest.cs" />
     <Compile Include="Util\AutoSyncOrders.cs" />
+    <Compile Include="Util\BarcodeCreator.cs" />
     <Compile Include="Util\DB\DBCreator.cs" />
     <Compile Include="Util\DB\DBDataAccess.cs" />
     <Compile Include="Util\Dummy.cs" />
     <Compile Include="Util\EventMessage.cs" />
     <Compile Include="Util\FileReader.cs" />
     <Compile Include="Util\Network\ProductImagesDownloader.cs" />
+    <Compile Include="Util\Network\Responses\DashboardIndexResponse.cs" />
+    <Compile Include="Util\Network\Responses\PaginatedResponse.cs" />
+    <Compile Include="Util\Printing\PageElement.cs" />
+    <Compile Include="Util\Printing\Paginator\ReceiptPaginator.cs" />
+    <Compile Include="Util\QueryStringBuilder.cs" />
     <Compile Include="Util\SquirrelHelper.cs" />
     <Compile Include="Util\Helpers.cs" />
     <Compile Include="Util\KStrings.cs" />
@@ -168,8 +216,15 @@
     <Compile Include="Util\Settings.cs" />
     <Compile Include="Util\Timer.cs" />
     <Compile Include="Util\TimerHelper.cs" />
+    <Compile Include="Util\Toast.cs" />
+    <Compile Include="Util\UniformGridPanel.cs" />
+    <Compile Include="Util\VirtualizedWrapPanel.cs" />
+    <Compile Include="Util\VirtualizingWrapPanel.cs" />
     <Compile Include="View\Dialogs\CartItemDescriptionDialog.xaml.cs">
       <DependentUpon>CartItemDescriptionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Dialogs\CustomDialog.xaml.cs">
+      <DependentUpon>CustomDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Dialogs\EditShopProductDialog.xaml.cs">
       <DependentUpon>EditShopProductDialog.xaml</DependentUpon>
@@ -183,6 +238,9 @@
     <Compile Include="View\Dialogs\SyncOrdersDialog.xaml.cs">
       <DependentUpon>SyncOrdersDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Dialogs\ViewOrder.xaml.cs">
+      <DependentUpon>ViewOrder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -195,8 +253,8 @@
     <Compile Include="View\Receipt\Thermal58mm.xaml.cs">
       <DependentUpon>Thermal58mm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Receipt\Thermal88mm.xaml.cs">
-      <DependentUpon>Thermal88mm.xaml</DependentUpon>
+    <Compile Include="View\Receipt\Thermal80mm.xaml.cs">
+      <DependentUpon>Thermal80mm.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserControls\Cart\CartItemUserCtrl.xaml.cs">
       <DependentUpon>CartItemUserCtrl.xaml</DependentUpon>
@@ -210,6 +268,12 @@
     <Compile Include="View\UserControls\Draft\DraftUserCtrl.xaml.cs">
       <DependentUpon>DraftUserCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UserControls\ProductBarcodeList.xaml.cs">
+      <DependentUpon>ProductBarcodeList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\ProductFilterCtrl.xaml.cs">
+      <DependentUpon>ProductFilterCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\UserControls\ProductListCtrl.xaml.cs">
       <DependentUpon>ProductListCtrl.xaml</DependentUpon>
     </Compile>
@@ -222,11 +286,23 @@
     <Compile Include="View\UserControls\Settings\PaperLayoutSettingsCtrl.xaml.cs">
       <DependentUpon>PaperLayoutSettingsCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UserControls\Settings\ReceiptBottomNote.xaml.cs">
+      <DependentUpon>ReceiptBottomNote.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\UserControls\Settings\SettingsUserCtrl.xaml.cs">
       <DependentUpon>SettingsUserCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UserControls\Settings\StickerLayoutSettingsCtrl.xaml.cs">
+      <DependentUpon>StickerLayoutSettingsCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\UserControls\Settings\VATSettingUserCtrl.xaml.cs">
       <DependentUpon>VATSettingUserCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\ToastCtrl\SingleToastCtrl.xaml.cs">
+      <DependentUpon>SingleToastCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\ToastCtrl\ToastPageCtrl.xaml.cs">
+      <DependentUpon>ToastPageCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserControls\TopMenu.xaml.cs">
       <DependentUpon>TopMenu.xaml</DependentUpon>
@@ -254,6 +330,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\Dialogs\CustomDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Dialogs\EditShopProductDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -269,6 +349,10 @@
     <Page Include="View\Dialogs\SyncOrdersDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Dialogs\ViewOrder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -286,7 +370,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Receipt\Thermal88mm.xaml">
+    <Page Include="View\Receipt\Thermal80mm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -306,6 +390,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\UserControls\ProductBarcodeList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControls\ProductFilterCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\UserControls\ProductListCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -322,13 +414,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\UserControls\Settings\ReceiptBottomNote.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\UserControls\Settings\SettingsUserCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\UserControls\Settings\StickerLayoutSettingsCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\UserControls\Settings\VATSettingUserCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControls\ToastCtrl\SingleToastCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControls\ToastCtrl\ToastPageCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\UserControls\TopMenu.xaml">
       <Generator>MSBuild:Compile</Generator>

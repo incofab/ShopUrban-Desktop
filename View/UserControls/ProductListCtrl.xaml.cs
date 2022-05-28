@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,14 +23,14 @@ namespace ShopUrban.View.UserControls
     /// </summary>
     public partial class ProductListCtrl : UserControl
     {
-
         public static readonly DependencyProperty ShopProductsProperty =
-            DependencyProperty.Register("ShopProducts", typeof(ObservableCollection<ShopProduct>),
+            DependencyProperty.Register("ShopProducts", typeof(List<ShopProduct>),
                 typeof(ProductListCtrl), new UIPropertyMetadata(null));
 
-        public ObservableCollection<ShopProduct> ShopProducts
+        public List<ShopProduct> ShopProducts
         {
-            get { return (ObservableCollection<ShopProduct>)GetValue(ShopProductsProperty); }
+            get { return (List<ShopProduct>)GetValue(ShopProductsProperty); }
+
             set { SetValue(ShopProductsProperty, value); }
         }
 
@@ -46,7 +47,10 @@ namespace ShopUrban.View.UserControls
             {
                 this.Background = Brushes.Transparent;
             }
+
             MyEventBus.subscribe(handleEvent);
+
+            refreshProductCategoryButtons();
         }
 
         void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -61,9 +65,20 @@ namespace ShopUrban.View.UserControls
             MyEventBus.unSubscribe(handleEvent);
         }
 
+        private int productsPerPage = 1000;
         public void displayProducts(List<ShopProduct> s)
         {
-            ShopProducts = new ObservableCollection<ShopProduct>(s);
+            //Application.Current.Dispatcher.Invoke(new Action(() => {
+            var len = s.Count;
+            ShopProducts = s.GetRange(0, len > productsPerPage ? productsPerPage : len);
+
+            if(ShopProducts != null && ShopProducts.Count > 0)
+            {
+                UniformGridPanel uniformGridPanel = FindVisualChild<UniformGridPanel>(lbProducts);
+
+                if (uniformGridPanel != null) uniformGridPanel.ScrollOwner.ScrollToTop();
+            }
+            //}));
         }
 
         public void loadView()
@@ -75,10 +90,10 @@ namespace ShopUrban.View.UserControls
 
         public List<ShopProduct> getItems()
         {
-            List<ShopProduct> s = ShopProduct.all();
+            return ShopProduct.all();
 
-            return s;
-
+            #region dummy ShopProducts
+            /*
             List<ShopProduct> shopProducts = new List<ShopProduct>();
             
             for (int i = 0; i < 0; i++)
@@ -100,39 +115,21 @@ namespace ShopUrban.View.UserControls
             }
 
             return shopProducts;
-        }
-
-        private void tbSearch_KeyUp(object sender, KeyEventArgs e)
-        {
-            //string searchQuery = tbSearch.Text.Trim().ToString();
-
-            //if (searchQuery.Length < 2)
-            //{
-            //    displayProducts(ShopProduct.all());
-
-            //    return;
-            //}
-
-            //List<ShopProduct> s = ShopProduct.all(searchQuery);
-
-            //if(s.Count == 1)
-            //{
-            //    var shopProduct = s[0];
-
-            //    if(shopProduct.stock_count > 0)
-            //    {
-            //        MyEventBus.post(new EventMessage(EventMessage.EVENT_ADD_TO_CART, shopProduct));
-            //    }
-            //}
-
-            //displayProducts(s);
+            */
+            #endregion
         }
 
         private void handleEvent(EventMessage eventMessage)
         {
             switch (eventMessage.eventId)
             {
+                case EventMessage.EVENT_PRODUCT_SYNC_COMPLETED:
                 case EventMessage.EVENT_SHOP_PRODUCT_UPDATED:
+                    refreshProductCategoryButtons();
+                    loadView();
+                    tbSearch.Focus();
+                    break;
+
                 case EventMessage.EVENT_ORDER_CREATED:
                     loadView();
                     tbSearch.Focus();
@@ -156,10 +153,10 @@ namespace ShopUrban.View.UserControls
             }
         }
 
+        private string prevSearchQuery = "";
         private void clearSearch_Click(object sender, RoutedEventArgs e)
         {
             tbSearch.Text = "";
-            //displayProducts(ShopProduct.all());
         }
 
         private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -168,26 +165,132 @@ namespace ShopUrban.View.UserControls
 
             if (searchQuery.Length < 2)
             {
-                displayProducts(ShopProduct.all());
+                if (searchQuery.Length == 2 || prevSearchQuery.Length == 0)
+                {
+                    prevSearchQuery = searchQuery;
+                    return;
+                }
+
+                //TimerHelper.SetTimeout(1000, () => { 
+                    displayProducts(getItems());
+                //});
+
+                prevSearchQuery = searchQuery;
 
                 return;
             }
 
             List<ShopProduct> s = ShopProduct.all(searchQuery);
 
-            if (s.Count == 1)
+            if (s.Count == 1 && isBarcode(searchQuery))
             {
                 var shopProduct = s[0];
 
-                if (shopProduct.stock_count > 0)
+                if (shopProduct.stock_count > 0 && shopProduct.sell_price > 0)
                 {
                     MyEventBus.post(new EventMessage(EventMessage.EVENT_ADD_TO_CART, shopProduct));
-                    //tbSearch.Text = "";
+
+                    prevSearchQuery = searchQuery;
+
                     return;
+                }
+                else
+                {
+                    var errorMessage = "";
+                    if (shopProduct.stock_count < 1) errorMessage += "Product out of stock\n";
+                    if (shopProduct.sell_price < 1) errorMessage += "Please, update product price";
+
+                    Helpers.playErrorSound();
+                    Toast.showError(errorMessage);
                 }
             }
 
+            prevSearchQuery = searchQuery;
+
             displayProducts(s);
+        }
+
+        private bool isBarcode(string str)
+        {
+            return str.Length > 9 && Helpers.IsDigits(str);
+        }
+
+        #region Handling Product Category
+        private void refreshProductCategoryButtons()
+        {
+            spCategory.Children.Clear();
+
+            //List<Button> buttons = new List<Button>();
+            List<ProductCategory> pcs = new List<ProductCategory>();
+            pcs.Add(new ProductCategory { id = 0, name = "All", slug = "" });
+            pcs.AddRange(ProductCategory.all());
+
+            List<string> check = new List<string>();
+            foreach (var productCategory in pcs)
+            {
+                if(check.Contains(productCategory.name)){
+                    continue;
+                }
+                
+                check.Add(productCategory.name);
+
+                Button b = new Button();
+                b.Content = productCategory.name;
+                b.Click += category_button_Click;
+                b.Name = "btn_" + Helpers.toAlphaNum(productCategory.slug);
+                b.Style = Application.Current.Resources["MaterialDesignOutlinedButton"] as Style;
+                b.Margin = new Thickness(5, 0, 5, 0);
+                b.Tag = productCategory.id;
+                
+                if(productCategory.id == 0) b.Background = Brushes.LightBlue;
+
+                spCategory.Children.Add(b);
+            }
+        }
+
+        private string selectedCategory = "All";
+        private void category_button_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            selectedCategory = button.Content.ToString();
+
+            List<ShopProduct> s = ShopProduct.all(null, null, -1, (int)button.Tag);
+            displayProducts(s);
+
+            foreach (var item in spCategory.Children)
+            {
+                var b = item as Button;
+
+                if(string.Equals(b.Content.ToString(), selectedCategory))
+                {
+                    b.Background = Brushes.LightBlue;
+                }
+                else
+                {
+                    b.Background = Brushes.Transparent;
+                }
+            }
+        }
+        #endregion
+
+        public TChildItem FindVisualChild<TChildItem>(DependencyObject obj) where TChildItem : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(obj, i);
+                
+                //Helpers.log("Child " + i + " = " + child.ToString());
+
+                if (child != null && child is TChildItem)
+                    return (TChildItem)child;
+
+                var childOfChild = FindVisualChild<TChildItem>(child);
+
+                if (childOfChild != null)
+                    return childOfChild;
+            }
+
+            return null;
         }
 
     }

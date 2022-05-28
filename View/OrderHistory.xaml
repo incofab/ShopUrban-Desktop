@@ -4,35 +4,81 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShopUrban.View"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:conv="clr-namespace:ShopUrban.Converters"
         mc:Ignorable="d"
         MinHeight="450" MinWidth="500"
         >
     <UserControl.Resources>
         <conv:NairaConverter x:Key="nairaConverter" />
+        <conv:DateTimeConverter x:Key="dateTimeConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border Grid.Row="0" Background="#ededfb" BorderThickness="0 0 0 0" BorderBrush="Gray" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="#ededfb" 
+                BorderThickness="0 0 0 0" BorderBrush="Gray" >
             <TextBlock Text="Orders" FontSize="20" Margin="10 5"  />
         </Border>
-        <DataGrid Name="dataGrid" AlternatingRowBackground="LightBlue" Grid.Row="1"
+        <ProgressBar x:Name="progressBar" Grid.Row="1" Height="5" IsIndeterminate="True" Visibility="Collapsed" />
+        <DataGrid Grid.Row="2" Grid.Column="0" Name="dataGrid" AlternatingRowBackground="LightBlue" 
             AlternationCount="2" AutoGenerateColumns="False" ItemsSource="{Binding orders}"
-            SelectionChanged="dataGrid_SelectionChanged" IsReadOnly="True" MouseDoubleClick="dataGrid_MouseDoubleClick" >
+            SelectionChanged="dataGrid_SelectionChanged" IsReadOnly="True" 
+                  MouseDoubleClick="dataGrid_MouseDoubleClick" >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Date Sold" Binding="{Binding created_at}" />
+                <DataGridTextColumn Header="Date Sold" Binding="{Binding created_at, Converter={StaticResource dateTimeConverter}}"
+                                    FontWeight="Normal" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Sold By" Binding="{Binding staff.name}" />
                 <DataGridTextColumn Header="Order Number" Binding="{Binding order_number}" />
                 <!--<DataGridTextColumn Header="Amount" Binding="{Binding amountNaira}" />-->
                 <DataGridTextColumn Header="Amount" Binding="{Binding amount_to_pay, Converter={StaticResource nairaConverter}}" />
                 <DataGridTextColumn Header="Balance" Binding="{Binding remaining_amount, Converter={StaticResource nairaConverter}}" />
-                <DataGridTextColumn Header="Qty Items Sold" Binding="{Binding cart.quantity}" />
-                <DataGridTextColumn Header="Status" Binding="{Binding status}"  />
+                <DataGridTextColumn Header="Qty Items Sold" Binding="{Binding cart.quantity}" Width="70" />
+                <DataGridTextColumn Header="Channel" Binding="{Binding channel}" />
+                <DataGridTextColumn Header="Status" Binding="{Binding status}" Width="100" IsReadOnly="True" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="btnPreview" Style="{StaticResource plainButton}" ToolTip="Preview"
+                                        Click="btnPreview_Click">
+                                    <materialDesign:PackIcon Kind="Eye" />
+                                </Button>
+                                <Button x:Name="btnPrint" Style="{StaticResource plainButton}" ToolTip="Print" 
+                                        Margin="10 0 0 0" Click="btnPrint_Click">
+                                    <materialDesign:PackIcon Kind="Printer" />
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <Button x:Name="btnPrev" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Margin="5 0 0 5"
+                Style="{StaticResource MaterialDesignOutlinedDarkButton}" Visibility="Collapsed"
+                HorizontalAlignment="Left" Click="btn_Click" >
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="ArrowLeftBoldOutline" Margin="0 2 0 0" />
+                <TextBlock Text="Prev" Margin="10 0 0 0" />
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnNext" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Margin="0 0 5 5"
+                Style="{StaticResource MaterialDesignOutlinedDarkButton}" Visibility="Collapsed"
+                HorizontalAlignment="Right" Click="btn_Click" >
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Next" Margin="0 0 10 0" />
+                <materialDesign:PackIcon Kind="ArrowRightBoldOutline" Margin="0 2 0 0" />
+            </StackPanel>
+        </Button>
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" Name="borderProductFilterCtrl" Width="340">
+            
+        </Border>
     </Grid>
 </UserControl>

@@ -14,10 +14,10 @@ namespace ShopUrban.Model
     public class City : BaseModel
     {
         public int id { get; set; }
+        public int? region_id { get; set; }
         public int state_id { get; set; }
         public string name { get; set; }
         public string slug { get; set; }
-        public string region_id { get; set; }
 
     }
 }

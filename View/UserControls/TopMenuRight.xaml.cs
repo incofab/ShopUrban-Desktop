@@ -2,10 +2,12 @@
 using ShopUrban.Services;
 using ShopUrban.Util;
 using ShopUrban.Util.Network;
+using Squirrel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -37,13 +39,22 @@ namespace ShopUrban.View.UserControls
             LoginHelper.logout();
         }
 
-        private async void uploadOrders()
+        private void uploadOrders()
         {
-            iconUploadOrder.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudUpload;
-            
-            await ProductDownloader.getInstance().uploadOrders(true);
+            if (iconUploadOrder.Kind == MaterialDesignThemes.Wpf.PackIconKind.CloudUpload) return;
 
-            iconUploadOrder.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudUploadOutline;
+            iconUploadOrder.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudUpload;
+
+            OrderHelper.uploadPendingOrders((BaseResponse baseResponse) => {
+
+                if (baseResponse != null) Toast.showSuccess("Orders uploaded successfully");
+
+                iconUploadOrder.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudUploadOutline;
+            },
+            true);
+
+            //await ProductDownloader.getInstance().uploadOrders(true);
+            //iconUploadOrder.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudUploadOutline;
         }
 
         private void btnUploadOrder_Click(object sender, RoutedEventArgs e)
@@ -65,10 +76,12 @@ namespace ShopUrban.View.UserControls
         {
             try
             {
-                var updateAvailable = await SquirrelHelper.getInstance().checkForUpdate();
+                var squirrelHelper = SquirrelHelper.getInstance();
+                var updateAvailable = await squirrelHelper.checkForUpdate();
 
                 if (!updateAvailable)
                 {
+                    squirrelHelper.dispose();
                     MessageBox.Show("Product is upto date");
                     return;
                 }
@@ -79,7 +92,14 @@ namespace ShopUrban.View.UserControls
 
                 if (messageBoxResult != MessageBoxResult.OK) return;
 
-                SquirrelHelper.getInstance().update();
+                ReleaseEntry releaseEntry = await squirrelHelper.update();
+
+                if(releaseEntry != null)
+                {
+                    MessageBox.Show("Update complete, You can relaunch your application now to use the new update");
+                }
+
+                squirrelHelper.dispose();
             }
             catch (Exception e)
             {
@@ -87,44 +107,27 @@ namespace ShopUrban.View.UserControls
             }
         }
 
-        private async void syncProducts()
+        private void syncProducts()
         {
             iconSyncProducts.Kind = MaterialDesignThemes.Wpf.PackIconKind.Cloud;
-            
-            //await ProductSyncHelper.syncProducts();
-            List<Product> products = await ProductSyncHelper.syncProducts();
 
-            downloadImages();
+            var obj = new SynchronizeShopProduct(
+                (List<ShopProduct> shopProducts) => {
 
-            MessageBox.Show("Product Sync complete, Images will continue in background");
+                    bool isDownloadingImages = shopProducts != null && shopProducts.Count > 0;
 
-            iconSyncProducts.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudRefresh;
+                    if (isDownloadingImages) 
+                        Toast.showSuccess("Product Sync complete, Images will continue in background");
+                    else 
+                        Toast.showWarning("Products of this shop are upto date");
 
-            MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_COMPLETED, null));
+                    iconSyncProducts.Kind = MaterialDesignThemes.Wpf.PackIconKind.CloudRefresh;
+                }
+            );
+
+            obj.syncProductsAndImages();
+
+            DashboardSyncHelper.syncDashboard();
         }
-
-        private void downloadImages()
-        {
-            ProductImagesDownloader productImagesDownloader = new ProductImagesDownloader(null, downloadImages_completed);
-
-            List<ProductUnit> productUnits = ProductUnit.all(
-                " Where photo IS NOT NULL AND local_photo IS NULL ");
-
-            if (productUnits == null) return;
-
-            productImagesDownloader.beginDownloadProcess(productUnits);
-        }
-        private void downloadImages_completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-            TimerHelper.SetTimeout(1000, () =>
-            {
-                Application.Current.Dispatcher.Invoke((Action)delegate ()
-                {
-                    MyEventBus.post(new EventMessage(EventMessage.EVENT_PRODUCT_SYNC_COMPLETED, null));
-
-                }, null);
-            });
-        }
-
     }
 }

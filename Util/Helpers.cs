@@ -149,11 +149,11 @@ namespace ShopUrban.Util
                 .Any(w => w.Name.Equals(name));
         }
 
-        public static string naira(double amount)
+        public static string naira(decimal amount)
         {
             return KStrings.NAIRA_SIGN+numberFormat(amount);
         }
-        public static string numberFormat(double number)
+        public static string numberFormat(decimal number)
         {
             return string.Format("{0:#,##0.##}", number);
         }
@@ -174,19 +174,26 @@ namespace ShopUrban.Util
 
         public static Staff getLoggedInStaff()
         {
-            if (MainWindow.staffDetail != null) return MainWindow.staffDetail;
+            return MainWindow.staffDetail;
+        }
 
+        public static Staff getLoggedInStaffFromDB()
+        {
             var id = Setting.getValue(Setting.KEY_LOGGED_IN_STAFF_ID);
 
-            int idInt;
-            int.TryParse(id, out idInt);
+            int.TryParse(id, out int idInt);
 
             return Staff.findById(idInt);
         }
 
-        public static void log(string message)
+        public static Shop getCurrentShop()
         {
-            if (!KStrings.DEV) return;
+            return MainWindow.shopDetail;
+        }
+
+        public static void log(string message, bool forceWrite = false)
+        {
+            //if (!KStrings.DEV && !forceWrite) return;
 
             Trace.WriteLine(message);
         }
@@ -203,7 +210,42 @@ namespace ShopUrban.Util
         public static bool IsPhoneNumberValid(string number)
         {
             //return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
+            if (number == null) return false;
+
+            if (number.StartsWith("+234"))
+            {
+                number = "0"+number.Substring(4);
+            }
             return Regex.Match(number, @"^[0][0-9]{10}$").Success;
+        }
+
+        public static string formatPhone(string phone)
+        {
+            if (string.IsNullOrEmpty(phone)) return phone;
+
+            if (phone.StartsWith("0"))
+            {
+                phone = "+234" + phone.Substring(1);
+            }
+            else if (!phone.StartsWith("+"))
+            {
+                phone = "+" + phone;
+            }
+
+            return phone;
+        }
+        public static string toAlphaNum(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+
+            return str.Replace(" ", "_").Replace("-", "_");
+        }
+
+        public static bool IsDigits(string str)
+        {
+            if (str == null) return false;
+
+            return str.All(char.IsDigit);
         }
         public static string getVersionNo()
         {
@@ -218,26 +260,30 @@ namespace ShopUrban.Util
         {
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
+        public static void runOnUiThread(Action function)
+        {
+            Application.Current.Dispatcher.Invoke(function);
+        }
 
-        public static void showReceipt(Order order)
+        public static void showReceipt(Order order, bool autoPrint)
         {
             var layout = Setting.getValue(Setting.KEY_RECEIPT_LAYOUT);
 
             if (Setting.RECEIPT_LAYOUT_58MM.Equals(layout))
             {
-                new Thermal58mm(order).ShowDialog();
+                new Thermal58mm(order, autoPrint).ShowDialog();
             }
-            else if (Setting.RECEIPT_LAYOUT_88MM.Equals(layout))
+            else if (Setting.RECEIPT_LAYOUT_80MM.Equals(layout))
             {
-                new Thermal88mm(order).ShowDialog();
+                new Thermal80mm(order, autoPrint).ShowDialog();
             }
             else if (Setting.RECEIPT_LAYOUT_A4.Equals(layout))
             {
-                new A4Receipt(order).ShowDialog();
+                new A4Receipt(order, autoPrint).ShowDialog();
             }
             else
             {
-                new Thermal88mm(order).ShowDialog();
+                new Thermal80mm(order, autoPrint).ShowDialog();
             }
         }
         

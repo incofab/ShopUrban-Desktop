@@ -39,27 +39,26 @@ namespace ShopUrban.Model
 
         public static List<Staff> all()
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var query = cnn.Query<Staff>($"SELECT * FROM staff");
+            var cnn = DBCreator.getConn();
+
+            var query = cnn.Query<Staff>($"SELECT * FROM staff");
                 
-                return query.ToList<Staff>();
-            }
+            return query.ToList<Staff>();
         }
 
-        public static Staff login(string phone, string pin)
+        public static Staff login(string phone, string password)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                object queryObject = new { phone = phone, pin = pin, };
+            var cnn = DBCreator.getConn();
 
-                var whereQuery = prepareEqQuery(queryObject);
+            object queryObject = new { phone = phone, password = password, };
 
-                var query = cnn.Query<Staff>($"SELECT * FROM staff {whereQuery}", queryObject).ToList();
+            var whereQuery = prepareEqQuery(queryObject);
 
-                return query.Count > 0 ? query.First() : null;
-            }
+            var query = cnn.Query<Staff>($"SELECT * FROM staff {whereQuery}", queryObject).ToList();
+
+            return query.Count > 0 ? query.First() : null;
         }
+
         public static Staff findById(int id)
         {
             return eqQuery(new { id = id });
@@ -67,34 +66,43 @@ namespace ShopUrban.Model
 
         public static Staff eqQuery(object queryObject)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var whereQuery = prepareEqQuery(queryObject);
+            var cnn = DBCreator.getConn();
 
-                var query = cnn.Query<Staff>($"SELECT * FROM staff {whereQuery}", queryObject).ToList();
+            var whereQuery = prepareEqQuery(queryObject);
 
-                return query.Count > 0 ? query.First() : null;
-            }
+            var query = cnn.Query<Staff>($"SELECT * FROM staff {whereQuery}", queryObject).ToList();
+
+            return query.Count > 0 ? query.First() : null;
         }
 
-        public static void save(Staff staff)
+        public static Staff save(Staff staff)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, staff, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, staff);
-            }
+            var insertSql = prepareInsertQuery(table, staff, fillable);
+
+            cnn.Execute(insertSql, staff);
+
+            return eqQuery(new { user_id = staff.user_id });
         }
 
         public static void updateByUserId(Staff staff)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var updateSql = prepareUpdateQuery(table, staff, new { user_id = staff.user_id});
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(updateSql, staff);
-            }
+            var updateSql = prepareUpdateQuery(table, staff, new { user_id = staff.user_id});
+
+            cnn.Execute(updateSql, staff);
+        }
+
+        public static void deleteById(int id)
+        {
+            var cnn = DBCreator.getConn();
+
+            var obj = new { id = id };
+            var deleteSql = deleteQuery(table, obj);
+
+            cnn.Execute(deleteSql, obj);
         }
 
     }

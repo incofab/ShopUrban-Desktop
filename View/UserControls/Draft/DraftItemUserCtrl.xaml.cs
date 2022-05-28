@@ -62,15 +62,17 @@ namespace ShopUrban.View.UserControls.Draft
         {
             MyEventBus.post(new EventMessage(EventMessage.EVENT_DRAFT_EDIT, cartDraft));
             
-            //TimerHelper.SetTimeout(1000, () => {
-                
-            //    Application.Current.Dispatcher.Invoke(new Action(() => { 
-                    
-            //        deleteCartDraft(cartDraft);
-                
-            //    }));
+            TimerHelper.SetTimeout(1000, () =>
+            {
 
-            //});
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+
+                    deleteCartDraft(cartDraft);
+
+                }));
+
+            });
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)

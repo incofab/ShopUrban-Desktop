@@ -8,7 +8,7 @@ namespace ShopUrban.Services
 {
     public class LoginHelper
     {
-        public static void logout()
+        public static void logout(bool deleteStaffData = false)
         {
             DateTime.Now.ToString(KStrings.TIME_FORMAT);
 
@@ -19,6 +19,14 @@ namespace ShopUrban.Services
                 value = "",
                 type = "boolean"
             }, Setting.KEY_REMEMBER_LOGIN);
+
+            if (deleteStaffData)
+            {
+                int.TryParse(Setting.getValue(Setting.KEY_LOGGED_IN_STAFF_ID), out int staffId);
+
+                if(staffId > 0) 
+                    Staff.deleteById(staffId);
+            }
 
             Setting.update(new
             {

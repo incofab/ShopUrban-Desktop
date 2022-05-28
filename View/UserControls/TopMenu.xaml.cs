@@ -88,7 +88,7 @@ namespace ShopUrban.View.UserControls
 
             if (!updateAvailable)
             {
-                MessageBox.Show("Product is upto date");
+                Toast.showInformation("Product is upto date");
                 return;
             }
 

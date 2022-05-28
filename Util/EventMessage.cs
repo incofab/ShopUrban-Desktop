@@ -18,6 +18,14 @@ namespace ShopUrban.Model
         public const int EVENT_DRAFT_EDIT = 8;
         public const int EVENT_CART_CLEARED = 9;
         public const int EVENT_SHOP_PRODUCT_UPDATED = 10;
+        public const int EVENT_ORDER_INDEX = 11;
+
+        public const int EVENT_TOAST_SUCCESS = 12;
+        public const int EVENT_TOAST_ERROR = 13;
+        public const int EVENT_TOAST_INFO = 14;
+        public const int EVENT_TOAST_WARNING = 15;
+
+        public const int EVENT_PRODUCT_SYNC_FAILED = 16;
 
         public int eventId
         {

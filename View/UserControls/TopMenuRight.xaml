@@ -13,22 +13,22 @@
         <StackPanel Grid.Column="1" Orientation="Horizontal">
             <Button Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Check for Update"
                    Click="checkUpdate_Click" Cursor="Hand" >
-                <materialDesign:PackIcon Name="iconCheckUpdate" Kind="Update" 
+                <materialDesign:PackIcon Name="iconCheckUpdate" Kind="Update" Height="22" Width="22"
                                          Foreground="DarkGreen" FontWeight="Bold" />
             </Button>
             <Button x:Name="btnSyncProducts" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Download and synchronize products"
                    Click="btnSyncProducts_Click" Cursor="Hand" >
-                <materialDesign:PackIcon Name="iconSyncProducts" Kind="CloudRefresh" 
+                <materialDesign:PackIcon Name="iconSyncProducts" Kind="CloudRefresh" Height="22" Width="22"
                                          Foreground="{StaticResource SecondaryHueMidForegroundBrush}" />
             </Button>
             <Button Name="btnUploadOrder" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Upload recently added orders"
                    Click="btnUploadOrder_Click" Cursor="Hand" >
-                <materialDesign:PackIcon Name="iconUploadOrder" Kind="CloudUploadOutline" 
+                <materialDesign:PackIcon Name="iconUploadOrder" Kind="CloudUploadOutline" Height="22" Width="22"
                                          Foreground="{StaticResource PrimaryHueDarkBrush}" />
             </Button>
             <Button x:Name="btnLogout" Style="{StaticResource plainButton}" Padding="15 3" ToolTip="Logout" 
                         Click="btnLogout_Click" Cursor="Hand" >
-                <materialDesign:PackIcon Kind="Power" Foreground="Red" />
+                <materialDesign:PackIcon Kind="Power" Foreground="Red" Height="22" Width="22" />
             </Button>
         </StackPanel>
     </Grid>

@@ -28,59 +28,58 @@ namespace ShopUrban.Model
 
         public static List<CartDraft> all(string orderBy = "ASC")
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var cartDrafts = cnn.Query<CartDraft>($"SELECT * FROM {table}").ToList<CartDraft>();
+            var cnn = DBCreator.getConn();
+
+            var cartDrafts = cnn.Query<CartDraft>($"SELECT * FROM {table}").ToList<CartDraft>();
                 
-                foreach (var cartDraft in cartDrafts)
-                {
-                    var sql = $" SELECT * FROM {CartItemDraft.table} " +
-                    $" LEFT JOIN shop_products ON cart_item_drafts.shop_product_id = shop_products.id " +
-                    $" WHERE {CartItemDraft.table}.cart_id = @cart_id";
+            foreach (var cartDraft in cartDrafts)
+            {
+                var sql = $" SELECT * FROM {CartItemDraft.table} " +
+                $" LEFT JOIN shop_products ON cart_item_drafts.shop_product_id = shop_products.id " +
+                $" WHERE {CartItemDraft.table}.cart_id = @cart_id";
 
-                    var obj = new { cart_id = cartDraft.id };
-                    //Helpers.log("SQL Query = " + sql);
-                    var cartItemDrafts = cnn.Query<CartItemDraft, ShopProduct, CartItemDraft>
-                        (sql, (cartItemDraft, shopProduct) =>
-                        {
-                            cartItemDraft.shopProduct = shopProduct;
+                var obj = new { cart_id = cartDraft.id };
+                //Helpers.log("SQL Query = " + sql);
+                var cartItemDrafts = cnn.Query<CartItemDraft, ShopProduct, CartItemDraft>
+                    (sql, (cartItemDraft, shopProduct) =>
+                    {
+                        cartItemDraft.shopProduct = shopProduct;
 
-                            return cartItemDraft;
+                        return cartItemDraft;
 
-                        }, obj, splitOn: "id").ToList<CartItemDraft>();
+                    }, obj, splitOn: "id").ToList<CartItemDraft>();
 
-                    cartDraft.cartItems = cartItemDrafts;
-                }
-
-                return cartDrafts;
+                cartDraft.cartItems = cartItemDrafts;
             }
+
+            return cartDrafts;
         }
+
         public static void save(CartDraft cart)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, cart, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, cart);
-            }
+            var insertSql = prepareInsertQuery(table, cart, fillable);
+
+            cnn.Execute(insertSql, cart);
         }
+
         public static CartDraft createAndReturn(CartDraft cart)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var insertSql = prepareInsertQuery(table, cart, fillable);
+            var cnn = DBCreator.getConn();
 
-                cnn.Execute(insertSql, cart);
+            var insertSql = prepareInsertQuery(table, cart, fillable);
 
-                var sql = $"SELECT * FROM {table} ORDER BY id DESC LIMIT 1";
+            cnn.Execute(insertSql, cart);
 
-                return cnn.Query<CartDraft>(sql).First();
-            }
+            var sql = $"SELECT * FROM {table} ORDER BY id DESC LIMIT 1";
+
+            return cnn.Query<CartDraft>(sql).First();
         }
 
         public static void saveRecords(List<CartItemDraft> cartItems)
         {
-            double amount = 0;
+            decimal amount = 0;
             int quantity = 0;
             foreach (var cartItem in cartItems)
             {
@@ -99,7 +98,7 @@ namespace ShopUrban.Model
 
             CartItemDraft.multiCreate(cartItems, cart.id);
 
-            Helpers.log("Draft records successfully");
+            //Helpers.log("Draft records successfully");
 
             MyEventBus.post(new EventMessage(EventMessage.EVENT_DRAFT_CREATED, null));
 
@@ -108,23 +107,22 @@ namespace ShopUrban.Model
 
         public static void delete(CartDraft cart)
         {
-            using (IDbConnection cnn = new SQLiteConnection(DBCreator.dbConnectionString))
-            {
-                var deleteObj = new { id = cart.id };
-                var deleteObj2 = new { cart_id = cart.id };
+            var cnn = DBCreator.getConn();
 
-                var deleteSql = deleteQuery(CartDraft.table, deleteObj);
+            var deleteObj = new { id = cart.id };
+            var deleteObj2 = new { cart_id = cart.id };
 
-                //Trace.WriteLine("deleteSql = " + deleteSql);
+            var deleteSql = deleteQuery(CartDraft.table, deleteObj);
 
-                cnn.Execute(deleteSql, deleteObj);
+            //Trace.WriteLine("deleteSql = " + deleteSql);
 
-                var deleteCartItemDraftSql = deleteQuery(CartItemDraft.table, deleteObj2);
+            cnn.Execute(deleteSql, deleteObj);
 
-                //Trace.WriteLine("deleteCartItemDraftSql = " + deleteCartItemDraftSql);
+            var deleteCartItemDraftSql = deleteQuery(CartItemDraft.table, deleteObj2);
 
-                cnn.Execute(deleteCartItemDraftSql, deleteObj2);
-            }
+            //Trace.WriteLine("deleteCartItemDraftSql = " + deleteCartItemDraftSql);
+
+            cnn.Execute(deleteCartItemDraftSql, deleteObj2);
         }
 
     }

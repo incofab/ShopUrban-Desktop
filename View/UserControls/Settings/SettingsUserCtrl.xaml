@@ -16,9 +16,21 @@
             <TextBlock Text="Settings" Margin="10 10 0 10" FontSize="15" />
         </Border>
         <StackPanel Grid.Row="1" Margin="10 10 0 0" Orientation="Vertical" >
-            <local:PaperLayoutSettingsCtrl />
+            <Border x:Name="bPaperLayoutSettingsCtrl"></Border>
+            <!--
+            -->
+            <!--
             <Separator Foreground="#000" Margin="0 15 0 15" Height="1" />
-            <local:VATSettingUserCtrl />
+            <Border x:Name="bVATSettingUserCtrl"></Border>
+            -->
+            <Separator Foreground="#FEFEFE" Margin="0 15 0 15" />
+            <Border x:Name="bStickerLayoutSettingsCtrl"></Border>
+            <!--
+            -->
+            <!--
+            <Separator Foreground="#FEFEFE" Margin="0 15 0 15" />
+            <Border x:Name="bReceiptBottomNote"></Border>
+            -->
             <Separator Foreground="#FEFEFE" Margin="0 15 0 15" />
         </StackPanel>
     </Grid>
